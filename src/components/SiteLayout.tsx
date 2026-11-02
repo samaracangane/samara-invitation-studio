@@ -5,9 +5,8 @@ import { INSTAGRAM, waLink } from "@/data/invites";
 
 export function Logo() {
   return (
-    <Link to="/" className="group flex items-center gap-2.5" aria-label="Convites Digitais - página inicial">
-      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md transition group-hover:rotate-[-5deg]"><Sparkles className="h-5 w-5"/></span>
-      <span className="flex flex-col leading-none"><span className="font-display text-[1.65rem] font-semibold tracking-tight text-foreground">Convites</span><span className="mt-1 text-[9px] font-bold uppercase tracking-[.34em] text-primary">DIGITAIS</span></span>
+    <Link to="/" className="group flex items-center" aria-label="Convites Digitais - página inicial">
+      <img src="/logo-convites-digitais.svg" alt="Convites Digitais" className="h-12 w-auto max-w-[220px] object-contain transition group-hover:scale-[1.02] sm:h-14" />
     </Link>
   );
 }
@@ -45,7 +44,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <main>{children}</main>
       <footer className="mt-16 bg-[var(--color-sidebar)] text-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-3">
-          <div><Logo/><p className="mt-4 max-w-xs text-sm leading-6 text-white/65">Convites personalizados, digitais e animados para celebrar os momentos mais especiais da vida.</p></div>
+          <div><div className="inline-flex rounded-xl bg-white px-3 py-2"><Logo/></div><p className="mt-4 max-w-xs text-sm leading-6 text-white/65">Convites personalizados, digitais e animados para celebrar os momentos mais especiais da vida.</p></div>
           <div><h3 className="font-display text-xl font-semibold">Navegue</h3><div className="mt-4 flex flex-col gap-3 text-sm text-white/70"><Link to="/" className="hover:text-white">Início</Link><Link to="/catalogo" className="hover:text-white">Catálogo de convites</Link><Link to="/sobre" className="hover:text-white">Sobre nós</Link><Link to="/contato" className="hover:text-white">Contato</Link></div></div>
           <div><h3 className="font-display text-xl font-semibold">Vamos conversar?</h3><p className="mt-3 text-sm text-white/65">Estamos aqui para ajudar você a encontrar o convite ideal.</p><div className="mt-4 flex flex-wrap gap-3"><a href={waLink("Olá! Vim pelo site.")} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm hover:bg-white/20"><MessageCircle className="h-4 w-4"/> WhatsApp</a><a href={`https://instagram.com/${INSTAGRAM}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm hover:bg-white/20"><Instagram className="h-4 w-4"/> Instagram</a></div></div>
         </div>
