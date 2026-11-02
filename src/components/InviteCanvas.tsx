@@ -37,7 +37,7 @@ function drawText(ctx: CanvasRenderingContext2D, f: TextField) {
   ctx.shadowOffsetY = 0;
 }
 
-type Props = { image: string; video?: string; fields: TextField[] };
+type Props = { image: string; video?: string | undefined; fields: TextField[] };
 
 export const InviteCanvas = forwardRef<InviteCanvasHandle, Props>(function InviteCanvas(
   { image, video, fields },
