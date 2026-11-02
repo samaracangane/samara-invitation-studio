@@ -30,7 +30,7 @@ export type Invite = {
   description: string;
   price: string;
   image: string;
-  video?: string;
+  video?: string | undefined;
   fields: TextField[];
 };
 
@@ -109,7 +109,7 @@ export const invites: Invite[] = [
 ];
 
 // versão em imagem do idol reaproveita os campos do animado
-invites[1].fields = invites[0].fields;
+invites[1]!.fields = invites[0]!.fields;
 
 export const getInvite = (id: string) => invites.find((i) => i.id === id);
 
