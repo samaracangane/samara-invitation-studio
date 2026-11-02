@@ -4,23 +4,19 @@ import { SiteLayout } from "@/components/SiteLayout";
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre — Samara Criar Art's" },
-      { name: "description", content: "Conheça o ateliê Samara Criar Art's de convites personalizados." },
-      { property: "og:title", content: "Sobre — Samara Criar Art's" },
-      { property: "og:description", content: "Ateliê de convites personalizados." },
+      { title: "Sobre — Convites Digitais" },
+      { name: "description", content: "Conheça nossa coleção de convites personalizados." },
+      { property: "og:title", content: "Sobre — Convites Digitais" },
+      { property: "og:description", content: "Convites personalizados para celebrar momentos especiais." },
     ],
   }),
   component: () => (
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-16">
-        <p className="font-script text-4xl text-primary">Nossa história</p>
+        <p className="font-script text-4xl text-primary">Nossa inspiração</p>
         <h1 className="font-display text-5xl">Arte que convida</h1>
-        <p className="mt-6 text-lg text-muted-foreground">
-          A Samara Criar Art's nasceu do amor por papelaria e design. Criamos convites digitais, animados e impressos para casamentos, aniversários de 15 anos, festas infantis e eventos especiais — cada um pensado para contar a história da sua celebração.
-        </p>
-        <p className="mt-4 text-lg text-muted-foreground">
-          No nosso site você personaliza o convite na hora e, se preferir, fala direto com a gente pelo WhatsApp para criar algo exclusivo.
-        </p>
+        <p className="mt-6 text-lg text-muted-foreground">Criamos convites digitais, animados e impressos para casamentos, aniversários de 15 anos, festas infantis e eventos especiais — cada modelo pensado para contar a história da sua celebração.</p>
+        <p className="mt-4 text-lg text-muted-foreground">Aqui você pode escolher seu modelo, personalizar os detalhes e, se preferir, falar diretamente com nossa equipe pelo WhatsApp para criar algo exclusivo.</p>
       </div>
     </SiteLayout>
   ),
