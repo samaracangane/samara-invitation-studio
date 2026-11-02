@@ -1,4 +1,5 @@
 import idol from "@/assets/tpl-idol.jpg";
+import micaelaKpop from "@/assets/micaela-kpop-demon-hunters.jpg";
 import casamento from "@/assets/tpl-casamento.jpg";
 import quinze from "@/assets/tpl-15anos.jpg";
 import safari from "@/assets/tpl-safari.jpg";
@@ -37,6 +38,15 @@ export type Invite = {
 export const CATEGORIES = ["Infantil", "Casamento", "15 Anos"] as const;
 
 export const invites: Invite[] = [
+  {
+    id: "micaela-kpop-demon-hunters",
+    name: "Convite Micaela — K-Pop Demon Hunters",
+    category: "Infantil",
+    description: "Convite digital temático K-Pop Demon Hunters, com arte em tons neon de rosa e roxo. Personalizado com nome, idade, data, horário e local da festa.",
+    price: "Consulte o valor",
+    image: micaelaKpop,
+    fields: [],
+  },
   {
     id: "idol-pop-animado",
     name: "Idol Pop Estrelinha (Animado)",
