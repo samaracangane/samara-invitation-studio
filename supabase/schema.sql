@@ -39,9 +39,9 @@ create policy "Admins manage invites" on public.invites
 -- Usuários não podem se promover a administrador. A inclusão inicial deve ser feita
 -- manualmente pelo proprietário no SQL Editor, após criar a conta em Authentication.
 drop policy if exists "Admins can read admin list" on public.admin_users;
-create policy "Admins can read admin list" on public.admin_users
+create policy "Users can read their own admin record" on public.admin_users
   for select to authenticated
-  using (exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+  using (user_id = auth.uid());
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('invite-media', 'invite-media', true, 52428800, array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm'])
@@ -68,3 +68,11 @@ drop policy if exists "Admins delete invite media" on storage.objects;
 create policy "Admins delete invite media" on storage.objects
   for delete to authenticated
   using (bucket_id = 'invite-media' and exists (select 1 from public.admin_users a where a.user_id = auth.uid()));
+
+
+-- Depois de criar/confirmar a conta deste e-mail em Authentication > Users,
+-- execute para conceder acesso administrativo:
+insert into public.admin_users (user_id)
+select id from auth.users
+where lower(email) = lower('samaracangane6@gmail.com')
+on conflict (user_id) do nothing;
