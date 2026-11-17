@@ -67,10 +67,12 @@ function PaymentSettings() {
     event.preventDefault();
     if (!supabase || !authorized) return;
     const cents = Math.round(Number(price.replace(",", ".")) * 100);
-    if (!Number.isSafeInteger(cents) || cents < 190 || !checkoutId.trim() || !/^https:\/\//i.test(checkoutUrl.trim())) {
-      setMessage("Informe preço a partir de R$ 1,90, ID do checkout e link HTTPS da oferta.");
+    if (!Number.isSafeInteger(cents) || cents < 190 || cents > 39700 || !checkoutId.trim() || !/^https:\/\//i.test(checkoutUrl.trim())) {
+      setMessage("Informe preço entre R$ 1,90 e R$ 397,00, ID do checkout e link HTTPS da oferta.");
       return;
     }
+    const sameCheckout = offers.filter((offer) => offer.checkout_id === checkoutId.trim() && offer.is_active && offer.price_cents !== cents);
+    if (sameCheckout.length >= 10) { setMessage("Este checkout já tem 10 ofertas ativas. Crie outro checkout na Wiapy para novas faixas de preço."); return; }
     setSaving(true);
     const { error } = await supabase.from("wiapy_offers").upsert({
       price_cents: cents,
@@ -150,7 +152,7 @@ function PaymentSettings() {
                   </div>
                 )) : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">Nenhuma faixa cadastrada.</p>}
               </div>
-              <div className="mt-6 flex gap-2 rounded-xl bg-blue-50 p-4 text-xs leading-5 text-blue-900"><CircleAlert size={18} className="shrink-0"/> A Wiapy documenta até 10 ofertas por checkout. Use o mesmo ID do checkout para todas as faixas que pertencem ao mesmo checkout. Cada preço precisa usar o link próprio da respectiva oferta.</div>
+              <div className="mt-6 flex gap-2 rounded-xl bg-blue-50 p-4 text-xs leading-5 text-blue-900"><CircleAlert size={18} className="shrink-0"/> A Wiapy documenta até 10 ofertas por checkout e um limite padrão de R$ 397,00 por oferta. Use o mesmo ID para as faixas do mesmo checkout; cada preço usa o link próprio da oferta.</div>
             </>
           )}
           {message && <p role="status" className="mt-4 rounded-xl bg-slate-100 p-3 text-sm">{message}</p>}
