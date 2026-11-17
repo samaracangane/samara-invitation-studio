@@ -16,6 +16,7 @@ import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ConviteIdRouteImport } from './routes/convite.$id'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EditorRouteImport } from './routes/editor'
+import { Route as PagamentosRouteImport } from './routes/pagamentos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,10 +53,16 @@ const EditorRoute = EditorRouteImport.update({
   path: '/editor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PagamentosRoute = PagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/editor': typeof EditorRoute
+  '/pagamentos': typeof PagamentosRoute
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/contato': typeof ContatoRoute
@@ -83,10 +90,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,6 +104,7 @@ export interface RootRouteChildren {
   ConviteIdRoute: typeof ConviteIdRoute
   AdminRoute: typeof AdminRoute
   EditorRoute: typeof EditorRoute
+  PagamentosRoute: typeof PagamentosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -150,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pagamentos': {
+      id: '/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/pagamentos'
+      preLoaderRoute: typeof PagamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -161,6 +176,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConviteIdRoute: ConviteIdRoute,
   AdminRoute: AdminRoute,
   EditorRoute: EditorRoute,
+  PagamentosRoute: PagamentosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
