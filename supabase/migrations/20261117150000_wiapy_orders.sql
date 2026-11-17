@@ -8,7 +8,7 @@ alter table public.orders
 
 alter table public.orders
   add constraint orders_payment_provider_check
-  check (payment_provider in ('wiapy', 'mercado_pago'));
+  check (payment_provider in ('wiapy'));
 
 alter table public.orders
   drop constraint if exists orders_payment_status_check;
@@ -22,4 +22,4 @@ create unique index if not exists orders_provider_payment_unique_idx
   where provider_payment_id is not null;
 
 comment on column public.orders.payment_provider is
-  'Provedor do pagamento. Wiapy e o provedor escolhido para novos pedidos; Mercado Pago permanece apenas para compatibilidade historica.';
+  'Wiapy e o unico provedor de pagamento habilitado para novos pedidos.';
