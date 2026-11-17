@@ -64,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
+  '/editor': typeof EditorRoute
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/contato': typeof ContatoRoute
@@ -72,6 +73,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   '/admin': typeof AdminRoute
+  '/editor': typeof EditorRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
@@ -81,7 +83,7 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
   id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
