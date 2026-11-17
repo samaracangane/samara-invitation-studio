@@ -7,8 +7,8 @@ import { invites } from "@/data/invites";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Convites Digitais — Seu momento merece um convite especial" },
-      { name: "description", content: "Escolha, personalize e encante. Convites digitais e animados para tornar sua comemoração inesquecível." },
+      { title: "Samara’s Enchanted Invite — Seu momento merece um convite especial" },
+      { name: "description", content: "Escolha, personalize e encante. Convites digitais e animados para tornar sua comemoração inesquecível na Samara’s Enchanted Invite." },
       { property: "og:title", content: "Convites Digitais — Seu momento merece um convite especial" },
       { property: "og:description", content: "Convites digitais e animados para celebrar momentos especiais." },
     ],
