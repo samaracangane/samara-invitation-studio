@@ -27,7 +27,7 @@ export type TextField = {
 export type Invite = {
   id: string;
   name: string;
-  category: "Infantil" | "Casamento" | "15 Anos";
+  category: "Infantil" | "Casamento" | "15 Anos" | "Mickey" | "Minnie" | "Bluey" | "Barbie" | "Safari" | "Princesas" | "Outros";
   description: string;
   price: string;
   image: string;
@@ -35,7 +35,7 @@ export type Invite = {
   fields: TextField[];
 };
 
-export const CATEGORIES = ["Infantil", "Casamento", "15 Anos"] as const;
+export const CATEGORIES = ["Infantil", "Casamento", "15 Anos", "Mickey", "Minnie", "Bluey", "Barbie", "Safari", "Princesas", "Outros"] as const;
 
 export const invites: Invite[] = [
   {
