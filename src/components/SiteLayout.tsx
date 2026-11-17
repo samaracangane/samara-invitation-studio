@@ -5,8 +5,8 @@ import { INSTAGRAM, waLink } from "@/data/invites";
 
 export function Logo() {
   return (
-    <Link to="/" className="group flex items-center" aria-label="Convites Digitais - página inicial">
-      <img src="/logo-convites-digitais.svg" alt="Convites Digitais" className="h-12 w-auto max-w-[220px] object-contain transition group-hover:scale-[1.02] sm:h-14" />
+    <Link to="/" className="group flex items-center" aria-label="Samara’s Enchanted Invite - página inicial">
+      <img src="/logo-convites-digitais.svg" alt="Samara’s Enchanted Invite" className="h-12 w-auto max-w-[220px] object-contain transition group-hover:scale-[1.02] sm:h-14" />
     </Link>
   );
 }
@@ -25,7 +25,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen font-sans">
       <div className="bg-[var(--color-sidebar)] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-2 text-center text-[11px] font-medium tracking-wide sm:text-xs">
-          <Sparkles className="mr-2 h-3.5 w-3.5 text-[var(--color-gold)]"/> Convites digitais feitos para transformar momentos em lembranças
+          <Sparkles className="mr-2 h-3.5 w-3.5 text-[var(--color-gold)]"/> Samara’s Enchanted Invite · convites digitais feitos para transformar momentos em lembranças
         </div>
       </div>
       <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 shadow-sm backdrop-blur-xl">
