@@ -24,3 +24,12 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+
+## Editor e pagamentos Wiapy
+
+- Editor do cliente: /editor (prévia sem exportação até validar um pedido pago).
+- Página de retorno: /retorno.
+- Configuração de faixas de preço Wiapy: /pagamentos (somente administradores).
+- Funções Supabase: create-checkout, wiapy-webhook, order-status, save-design.
+- Leia docs/pagamento-dinamico.md para configuração, deploy e limitações do checkout por ofertas.
