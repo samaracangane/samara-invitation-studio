@@ -62,3 +62,15 @@ comment on table public.wiapy_offers is
   'Wiapy offer links keyed by price tier. Configure one generic product and up to 10 offers in a Wiapy checkout.';
 comment on table public.invite_designs is
   'Customer-edited invitation layers, saved only after the associated order is approved.';
+
+
+-- Seed the five priced examples already visible in the storefront.
+-- Images remain in the frontend assets until the owner uploads the catalog to Storage.
+insert into public.invites (slug, name, category, description, price, fields, is_active)
+values
+  ('idol-pop-animado', 'Idol Pop Estrelinha (Animado)', 'Infantil', 'Convite animado com pétalas e brilhos em movimento. Ideal para festas temáticas pop.', 45.00, '[]'::jsonb, true),
+  ('idol-pop', 'Idol Pop Estrelinha', 'Infantil', 'Versão em imagem do convite Idol Pop, pronta para WhatsApp.', 25.00, '[]'::jsonb, true),
+  ('casamento-rosas', 'Rosas & Eucalipto', 'Casamento', 'Aquarela delicada com moldura dourada. Elegância atemporal.', 35.00, '[]'::jsonb, true),
+  ('15-anos-coroa', 'Coroa Dourada', '15 Anos', 'Azul noite com coroa e brilhos dourados para uma debutante inesquecível.', 35.00, '[]'::jsonb, true),
+  ('safari-baby', 'Safari Baby', 'Safari', 'Bichinhos fofos da selva e balões coloridos.', 25.00, '[]'::jsonb, true)
+on conflict (slug) do nothing;
