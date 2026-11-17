@@ -17,6 +17,7 @@ import { Route as ConviteIdRouteImport } from './routes/convite.$id'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
+import { Route as RetornoRouteImport } from './routes/retorno'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,11 +59,17 @@ const PagamentosRoute = PagamentosRouteImport.update({
   path: '/pagamentos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetornoRoute = RetornoRouteImport.update({
+  id: '/retorno',
+  path: '/retorno',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/editor': typeof EditorRoute
   '/pagamentos': typeof PagamentosRoute
+  '/retorno': typeof RetornoRoute
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/contato': typeof ContatoRoute
@@ -90,10 +97,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,6 +112,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   EditorRoute: typeof EditorRoute
   PagamentosRoute: typeof PagamentosRoute
+  RetornoRoute: typeof RetornoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -165,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PagamentosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retorno': {
+      id: '/retorno'
+      path: '/retorno'
+      fullPath: '/retorno'
+      preLoaderRoute: typeof RetornoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -177,6 +192,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   EditorRoute: EditorRoute,
   PagamentosRoute: PagamentosRoute,
+  RetornoRoute: RetornoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
