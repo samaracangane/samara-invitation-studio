@@ -88,7 +88,7 @@ function InviteProduct() {
               <p className="mt-2 font-display text-3xl font-semibold">{invite.price}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Personalize os dados da comemoração e finalize seu convite no editor online.</p>
               <label className="mt-6 block text-sm font-semibold">Seu e-mail
-                <input type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                <input type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
               </label>
               <button type="button" onClick={startCheckout} disabled={busy} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 disabled:cursor-wait disabled:opacity-60">
                 <CreditCard className="h-4 w-4"/>{busy ? "Preparando pagamento..." : "Comprar e personalizar"}
