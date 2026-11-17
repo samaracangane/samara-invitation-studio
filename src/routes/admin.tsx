@@ -4,7 +4,7 @@ import {
   BadgeCheck, BarChart3, Check, ChevronRight, CirclePlus, ClipboardList,
   Crown, FileImage, FolderOpen, Gem, LayoutDashboard, LogOut, Menu,
   Package, Pencil, Plus, Save, Search, Settings, ShieldCheck, Sparkles,
-  Trash2, Upload, Users, X,
+  Trash2, Upload, Users, X, CreditCard,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
@@ -27,7 +27,7 @@ const emptyDraft = (): Draft => ({
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Painel administrativo — Convites Digitais" }] }),
+  head: () => ({ meta: [{ title: "Painel administrativo — Samara’s Enchanted Invite" }] }),
   component: AdminPage,
 });
 
@@ -183,6 +183,7 @@ function AdminPage() {
           <a href="#cadastro" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><CirclePlus size={18}/> Cadastrar convite</a>
           <a href="#catalogo" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><FolderOpen size={18}/> Meus convites</a>
           <a href="#categorias" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><BarChart3 size={18}/> Categorias</a>
+          <a href="/pagamentos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><CreditCard size={18}/> Pagamentos Wiapy</a>
         </nav>
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[.07] p-4">
           <div className="mb-2 flex items-center gap-2 text-amber-300"><Sparkles size={16}/><span className="text-xs font-semibold">Sua loja em destaque</span></div>
