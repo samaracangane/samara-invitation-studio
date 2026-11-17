@@ -23,4 +23,4 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing GitHub Actions secret SUPABASE_ACCESS_TOKEN" && exit 1)
-          supabase functions deploy wiapy-config-status --project-ref plgwbxdjynljffowkxqi
+          supabase functions deploy wiapy-config-status --project-ref plgwbxdjynljffowkxqi --yes
