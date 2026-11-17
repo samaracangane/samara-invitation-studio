@@ -1,47 +1,54 @@
-# Pagamento dinamico — Samara Criar Arts
+# Pagamentos Wiapy — Samara’s Enchanted Invite
 
-## Decisao de arquitetura
+## Estado da integração
 
-A loja usa um checkout dinamico por pedido. Nao e necessario cadastrar cada convite como produto na plataforma de pagamento.
+Wiapy é o provedor escolhido para a loja. O banco está preparado para registrar pedidos Wiapy, mas **pagamentos reais ainda não estão ativados**: a documentação pública consultada descreve a criação de checkouts pelo painel, mas não documenta uma API pública para criar uma cobrança/checkout com valor arbitrário por pedido.
 
-### Fluxo
+Não colocar tokens ou credenciais no frontend, no GitHub ou em mensagens.
 
-1. O cliente escolhe um convite no catalogo.
-2. O navegador envia somente o ID do convite e dados minimos de contato para uma Supabase Edge Function.
-3. A funcao consulta o convite ativo no banco e le o preco cadastrado. Ela ignora qualquer preco enviado pelo navegador.
-4. A funcao cria um pedido com o valor em centavos e uma chave de idempotencia.
-5. A funcao cria uma sessao de checkout no provedor e devolve a URL segura para redirecionamento.
-6. Um webhook do provedor confirma o resultado. A funcao valida a assinatura/notificacao e consulta o pagamento no provedor antes de marcar o pedido como aprovado.
-7. A loja libera instrucoes/entrega somente depois da confirmacao do webhook.
+## O que a documentação pública confirma
 
-## Provedor inicial sugerido: Mercado Pago Checkout Pro
+- Cada checkout precisa estar associado a um produto cadastrado.
+- O checkout define o valor e as formas de pagamento.
+- Um checkout pode ter até 10 ofertas com valores diferentes; cada oferta gera seu próprio link.
+- O webhook envia uma requisição HTTP POST em JSON e usa o token configurado no cabeçalho Authorization.
+- O payload do webhook contém payment.id, payment.status, payment.amount, checkout.id, customer e products. Valores monetários são enviados em centavos.
+- Status documentados: paid, unpaid, credit_card_declined, refunded e chargedback.
 
-A API oficial permite criar uma preferencia de pagamento com itens, preco e quantidade no backend e retorna a URL de checkout. Para uma integracao nova, a documentacao atual recomenda avaliar o fluxo Orders API; a Preferences API tambem documenta a criacao de preferencia e o redirecionamento.
+Fontes oficiais:
+- https://help.wiapy.com/pt-br/article/como-criar-um-checkout-e-pegar-o-link-de-venda-1omdaab/
+- https://help.wiapy.com/pt-br/article/webhook-jtggmu/
 
-Referencias oficiais:
-- https://www.mercadopago.com.br/developers/pt/reference/online-payments/checkout-pro-orders/overview
-- https://www.mercadopago.com.br/developers/pt/reference/online-payments/checkout-pro-preferences/create-preference/post
+## Arquitetura proposta
 
-## Seguranca obrigatoria
+1. O cliente escolhe um convite; o navegador envia apenas o ID do convite.
+2. O servidor consulta o preço atual do convite no banco e cria um pedido pendente em centavos.
+3. O servidor seleciona o checkout Wiapy associado ao convite e redireciona o cliente.
+4. O webhook valida o cabeçalho Authorization e confere o checkout, valor, moeda e identificador do pedido com os dados guardados no servidor.
+5. O servidor processa o webhook de forma idempotente usando payment.id.
+6. Somente com status paid e correspondência integral do pedido o sistema libera o editor e o download.
 
-- Access token do provedor e SUPABASE_SERVICE_ROLE_KEY somente como secrets do servidor/Edge Functions.
-- Nunca colocar tokens no frontend, GitHub, variaveis VITE_ ou mensagens.
-- O preco e o estado do pedido sao controlados pelo servidor.
-- Validar assinatura do webhook e confirmar o pagamento consultando a API do provedor; nao confiar apenas na URL de retorno do navegador.
-- Usar idempotencia para evitar cobrancas duplicadas.
-- Aplicar rate limiting e validacao dos campos recebidos.
-- Nao liberar arquivos/convites antes da confirmacao de pagamento.
+## Limitação que precisa ser resolvida antes de automatizar
 
-## Titularidade e ativacao
+A documentação pública confirma webhooks, mas não confirma endpoint de API para criar um checkout dinâmico por pedido nem um campo de referência externa para associar um pedido interno ao pagamento. Um único checkout compartilhado entre muitos convites não identifica, por si só, qual convite foi comprado.
 
-A conta do provedor de pagamento, verificacoes de identidade, recebimentos e credenciais devem ser configurados e administrados por um responsavel adulto autorizado, seguindo os termos do provedor. A integracao fica em modo de configuracao ate que a conta e os secrets sejam adicionados com seguranca.
+Caminhos possíveis:
+- Solicitar à Wiapy a documentação da API de criação de checkout/pagamento com valor dinâmico e campo de referência externa; ou
+- Confirmar se é possível reutilizar um único produto genérico e criar checkouts/ofertas com identificadores individuais para cada convite. O webhook inclui checkout.id, que pode ser mapeado no banco para o convite.
 
-## Proximas tarefas tecnicas
+Não implementar correspondência apenas por e-mail e valor: compras simultâneas do mesmo preço podem ser confundidas.
 
-1. Criar Edge Function `create-checkout` para consultar `invites.price`, criar `orders` e abrir checkout.
-2. Criar Edge Function `payment-webhook` para validar notificacoes e atualizar pedidos.
-3. Ligar o botao Comprar do detalhe do convite a `create-checkout`.
-4. Criar tela de sucesso/pendente/falha consultando o pedido no servidor.
-5. Testar em ambiente de teste antes de ativar pagamentos reais.
+## Segurança e titularidade
 
-A migration `20261117000000_brand_categories_wiapy.sql` anterior adiciona `checkout_url` para links fixos; esse campo nao e necessario para o fluxo dinamico e pode permanecer sem uso.
+- Segredos Wiapy e SUPABASE_SERVICE_ROLE_KEY ficam apenas em secrets do servidor/Edge Functions.
+- O preço e o estado do pedido são controlados no servidor, nunca pelo navegador.
+- Não liberar o editor apenas porque o cliente voltou à página de sucesso.
+- A conta de recebimento e a ativação da Wiapy devem ser feitas por um responsável adulto autorizado, seguindo os requisitos de idade e identidade do provedor.
+
+## Próximas tarefas
+
+1. Obter da Wiapy a confirmação da API/identificador de referência ou do modelo de checkout individual.
+2. Implementar Edge Function para criar pedido e encaminhar ao checkout.
+3. Implementar webhook Wiapy com validação de Authorization, valor, checkout.id e idempotência.
+4. Liberar o editor apenas após pagamento confirmado.
+5. Testar com pagamento de teste antes de ativar vendas reais.
