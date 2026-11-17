@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import {
   ArrowLeft, ArrowDown, ArrowUp, Download, Eye, EyeOff, Lock, Plus,
-  Redo2, RotateCcw, Sparkles, Trash2, Unlock, Undo2, WandSparkles,
+  Redo2, RotateCcw, Sparkles, Trash2, Unlock, Undo2, WandSparkles, ImagePlus,
 } from "lucide-react";
 import { invites, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
@@ -18,6 +18,8 @@ type Layer = {
   font: string;
   visible: boolean;
   locked: boolean;
+  kind?: "text" | "image";
+  src?: string;
 };
 
 const sampleLayers: Layer[] = [
@@ -156,8 +158,23 @@ function MagicEditor() {
   };
   const addSticker = () => {
     const id = "sticker-" + crypto.randomUUID();
-    updateLayers([...layers, { id, name: "Adesivo", text: "✨", x: 50, y: 68, size: 10, color: "#ffffff", font: "Arial", visible: true, locked: false }]);
+    updateLayers([...layers, { id, name: "Adesivo", text: "✨", x: 50, y: 68, size: 10, color: "#ffffff", font: "Arial", visible: true, locked: false, kind: "text" }]);
     setSelected(id);
+  };
+  const addImage = (file?: File) => {
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) { setNotice("Escolha uma imagem PNG, JPG ou WebP."); return; }
+    if (file.size > 1500000) { setNotice("A imagem deve ter até 1,5 MB para salvar no projeto."); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      const id = "image-" + crypto.randomUUID();
+      updateLayers([...layers, { id, name: file.name.slice(0, 28), text: file.name, x: 50, y: 65, size: 14, color: "#ffffff", font: "Arial", visible: true, locked: false, kind: "image", src: reader.result }]);
+      setSelected(id);
+      setNotice("Imagem adicionada como uma nova camada.");
+    };
+    reader.onerror = () => setNotice("Não foi possível carregar esta imagem.");
+    reader.readAsDataURL(file);
   };
   const undo = () => {
     const previous = history[history.length - 1];
@@ -198,9 +215,14 @@ function MagicEditor() {
   };
 
   const svgMarkup = useMemo(() => {
-    const textNodes = layers.filter((layer) => layer.visible).map((layer) =>
-      '<text x="' + layer.x + '%" y="' + layer.y + '%" text-anchor="middle" dominant-baseline="middle" font-family="' + escapeXml(layer.font) + ', Arial, sans-serif" font-size="' + layer.size + '%" font-weight="600" fill="' + layer.color + '" paint-order="stroke" stroke="#000000" stroke-opacity=".22" stroke-width=".5">' + escapeXml(layer.text) + "</text>"
-    ).join("");
+    const textNodes = layers.filter((layer) => layer.visible).map((layer) => {
+      if (layer.kind === "image" && layer.src) {
+        const left = layer.x - layer.size;
+        const top = layer.y - layer.size;
+        return '<image href="' + escapeXml(layer.src) + '" x="' + left + '%" y="' + top + '%" width="' + (layer.size * 2) + '%" height="' + (layer.size * 2) + '%" preserveAspectRatio="xMidYMid meet"/>';
+      }
+      return '<text x="' + layer.x + '%" y="' + layer.y + '%" text-anchor="middle" dominant-baseline="middle" font-family="' + escapeXml(layer.font) + ', Arial, sans-serif" font-size="' + layer.size + '%" font-weight="600" fill="' + layer.color + '" paint-order="stroke" stroke="#000000" stroke-opacity=".22" stroke-width=".5">' + escapeXml(layer.text) + "</text>";
+    }).join("");
     return '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 100 125"><image href="' + escapeXml(activeInvite.image) + '" x="0" y="0" width="100" height="125" preserveAspectRatio="xMidYMid slice"/>' + textNodes + "</svg>";
   }, [activeInvite.image, layers]);
 
@@ -257,7 +279,7 @@ function MagicEditor() {
       <div className="mx-auto grid max-w-7xl gap-5 px-3 py-5 sm:px-5 lg:grid-cols-[260px_minmax(300px,1fr)_290px]">
         <aside className="order-2 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:order-1">
           <div className="flex items-center justify-between gap-2"><h2 className="font-semibold">Camadas</h2><button onClick={addText} className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700"><Plus size={14}/> Texto</button></div>
-          <button onClick={addSticker} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 py-2 text-xs font-semibold text-violet-700"><Sparkles size={14}/> Adicionar adesivo mágico</button>
+          <button onClick={addSticker} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 py-2 text-xs font-semibold text-violet-700"><Sparkles size={14}/> Adicionar adesivo mágico</button><label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-violet-100 py-2 text-xs font-semibold text-violet-700"><ImagePlus size={14}/> Enviar imagem<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(event) => { addImage(event.currentTarget.files?.[0]); event.currentTarget.value = ""; }}/></label>
           <p className="mb-3 mt-3 text-xs text-slate-500">Selecione uma camada para editar ou arraste o texto no convite.</p>
           <div className="space-y-2">
             {[...layers].reverse().map((layer) => (
@@ -284,7 +306,7 @@ function MagicEditor() {
           </div>
           <div ref={stageRef} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp} className="relative aspect-[4/5] w-full max-w-[430px] touch-none overflow-hidden rounded-xl bg-white shadow-2xl" style={{ backgroundImage: 'url("' + activeInvite.image + '")', backgroundSize: "cover", backgroundPosition: "center" }}>
             {layers.filter((layer) => layer.visible).map((layer) => (
-              <button key={layer.id} type="button" onPointerDown={(event) => { setSelected(layer.id); if (!layer.locked) { dragStartRef.current = layers.map((item) => ({ ...item })); setDragging(layer.id); event.currentTarget.setPointerCapture(event.pointerId); } }} onClick={() => setSelected(layer.id)} className={"absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded px-1 outline-none " + (selected === layer.id ? "ring-2 ring-violet-400 ring-offset-2" : "hover:ring-1 hover:ring-white")} style={{ left: layer.x + "%", top: layer.y + "%", color: layer.color, fontFamily: layer.font, fontSize: "clamp(10px, " + (layer.size * 0.45) + "vw, 40px)", fontWeight: 600, textShadow: "0 1px 5px #0008" }}>{layer.text}</button>
+              <button key={layer.id} type="button" onPointerDown={(event) => { setSelected(layer.id); if (!layer.locked) { dragStartRef.current = layers.map((item) => ({ ...item })); setDragging(layer.id); event.currentTarget.setPointerCapture(event.pointerId); } }} onClick={() => setSelected(layer.id)} className={"absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded px-1 outline-none " + (selected === layer.id ? "ring-2 ring-violet-400 ring-offset-2" : "hover:ring-1 hover:ring-white")} style={{ left: layer.x + "%", top: layer.y + "%", color: layer.color, fontFamily: layer.font, fontSize: "clamp(10px, " + (layer.size * 0.45) + "vw, 40px)", fontWeight: 600, textShadow: "0 1px 5px #0008", width: layer.kind === "image" ? (layer.size * 2) + "%" : undefined, height: layer.kind === "image" ? (layer.size * 2) + "%" : undefined }}>{layer.kind === "image" && layer.src ? <img src={layer.src} alt={layer.name} draggable={false} className="h-full w-full object-contain"/> : layer.text}</button>
             ))}
             {!paidAccess && <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-4 py-1.5 text-[10px] font-bold tracking-[.2em] text-white">PRÉVIA</div>}
           </div>
@@ -296,10 +318,10 @@ function MagicEditor() {
           {active ? active.locked ? <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">Esta camada está bloqueada. Desbloqueie para editar.</p> : (
             <div className="mt-4 space-y-4">
               <label className="block text-xs font-medium">Nome da camada<input value={active.name} onChange={(event) => updateActive({ name: event.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"/></label>
-              <label className="block text-xs font-medium">Texto<input value={active.text} maxLength={100} onChange={(event) => updateActive({ text: event.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"/></label>
-              <label className="block text-xs font-medium">Fonte<select value={active.font} onChange={(event) => updateActive({ font: event.target.value })} className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm"><option>Fredoka</option><option>Great Vibes</option><option>Cinzel</option><option>Jost</option><option>Cormorant Garamond</option><option>Arial</option></select></label>
+              {active.kind !== "image" && <label className="block text-xs font-medium">Texto<input value={active.text} maxLength={100} onChange={(event) => updateActive({ text: event.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"/></label>}{active.kind === "image" && <p className="rounded-lg bg-violet-50 p-3 text-xs text-violet-800">Imagem adicionada. Arraste-a na prévia e ajuste o tamanho abaixo.</p>}
+              {active.kind !== "image" && <label className="block text-xs font-medium">Fonte<select value={active.font} onChange={(event) => updateActive({ font: event.target.value })} className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm"><option>Fredoka</option><option>Great Vibes</option><option>Cinzel</option><option>Jost</option><option>Cormorant Garamond</option><option>Arial</option></select></label>}
               <label className="block text-xs font-medium">Tamanho <span className="float-right">{active.size.toFixed(1)}</span><input type="range" min="2" max="16" step=".2" value={active.size} onChange={(event) => updateActive({ size: Number(event.target.value) })} className="mt-2 w-full accent-violet-700"/></label>
-              <label className="flex items-center justify-between text-xs font-medium">Cor do texto<input type="color" value={active.color} onChange={(event) => updateActive({ color: event.target.value })} className="h-9 w-14 cursor-pointer rounded border p-1"/></label>
+              {active.kind !== "image" && <label className="flex items-center justify-between text-xs font-medium">Cor do texto<input type="color" value={active.color} onChange={(event) => updateActive({ color: event.target.value })} className="h-9 w-14 cursor-pointer rounded border p-1"/></label>}
               <div className="grid grid-cols-2 gap-2"><label className="text-xs font-medium">Posição X<input type="number" min="0" max="100" value={Math.round(active.x)} onChange={(event) => updateActive({ x: Math.max(0, Math.min(100, Number(event.target.value))) })} className="mt-1 w-full rounded-lg border px-2 py-2"/></label><label className="text-xs font-medium">Posição Y<input type="number" min="0" max="100" value={Math.round(active.y)} onChange={(event) => updateActive({ y: Math.max(0, Math.min(100, Number(event.target.value))) })} className="mt-1 w-full rounded-lg border px-2 py-2"/></label></div>
             </div>
           ) : <p className="mt-3 text-sm text-slate-500">Escolha uma camada para começar.</p>}
