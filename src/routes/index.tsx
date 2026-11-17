@@ -40,6 +40,7 @@ function Home() {
               <Link to="/catalogo" className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-elegant)] transition hover:-translate-y-0.5 hover:shadow-xl">
                 Escolher meu convite <ArrowRight className="h-4 w-4" />
               </Link>
+              <a href="/editor" className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-white/75 px-6 py-3.5 text-sm font-semibold text-primary transition hover:bg-white"><WandSparkles className="h-4 w-4" /> Experimentar editor mágico</a>
               {animated && <Link to="/convite/$id" params={{ id: animated.id }} className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-white/70 px-7 py-3.5 text-sm font-semibold text-primary transition hover:bg-white">
                 <Play className="h-4 w-4" /> Ver convite animado
               </Link>}
