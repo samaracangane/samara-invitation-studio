@@ -59,7 +59,7 @@ function PaymentSettings() {
     event.preventDefault();
     if (!supabase) return;
     setMessage("Enviando link de acesso...");
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin + "/admin/pagamentos" } });
+    const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin + "/pagamentos" } });
     setMessage(error ? error.message : "Link enviado. Abra o e-mail neste mesmo dispositivo.");
   }
 
