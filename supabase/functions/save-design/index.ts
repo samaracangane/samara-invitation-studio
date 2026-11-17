@@ -21,7 +21,7 @@ Deno.serve(async (request) => {
     const accessToken = typeof body.accessToken === "string" ? body.accessToken : "";
     const design = body.design;
     if (!orderId || !accessToken || !design || typeof design !== "object") return response({ error: "Dados inválidos." }, 400);
-    if (JSON.stringify(design).length > 150000) return response({ error: "O projeto excede o tamanho permitido." }, 413);
+    if (JSON.stringify(design).length > 1700000) return response({ error: "O projeto excede o tamanho permitido." }, 413);
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     const { data: order } = await supabase.from("orders")
       .select("id,invite_id,payment_status,access_token_hash")
