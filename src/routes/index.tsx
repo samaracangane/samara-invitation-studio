@@ -9,8 +9,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Samara’s Enchanted Invite — Seu momento merece um convite especial" },
       { name: "description", content: "Escolha, personalize e encante. Convites digitais e animados para tornar sua comemoração inesquecível na Samara’s Enchanted Invite." },
-      { property: "og:title", content: "Convites Digitais — Seu momento merece um convite especial" },
-      { property: "og:description", content: "Convites digitais e animados para celebrar momentos especiais." },
+      { property: "og:title", content: "Samara’s Enchanted Invite — Seu momento merece um convite especial" },
+      { property: "og:description", content: "Convites digitais e animados para celebrar momentos especiais na Samara’s Enchanted Invite." },
     ],
   }),
   component: Home,
