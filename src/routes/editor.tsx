@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import {
   ArrowLeft, ArrowDown, ArrowUp, Download, Eye, EyeOff, Lock, Plus,
   Redo2, RotateCcw, Sparkles, Trash2, Unlock, Undo2,
@@ -82,7 +82,7 @@ function MagicEditor() {
     [next[selectedIndex], next[target]] = [next[target], next[selectedIndex]];
     updateLayers(next);
   };
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     if (!dragging || !stageRef.current) return;
     const bounds = stageRef.current.getBoundingClientRect();
     const x = Math.max(3, Math.min(97, ((event.clientX - bounds.left) / bounds.width) * 100));
