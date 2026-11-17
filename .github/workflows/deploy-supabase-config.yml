@@ -1,4 +1,4 @@
-name: Deploy Supabase config function
+name: Deploy Supabase payment functions
 
 on:
   workflow_dispatch:
@@ -24,3 +24,18 @@ jobs:
         run: |
           test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing GitHub Actions secret SUPABASE_ACCESS_TOKEN" && exit 1)
           supabase functions deploy wiapy-config-status --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy wiapy-webhook
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy wiapy-webhook --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy create-checkout
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy create-checkout --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy order-status
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy order-status --project-ref plgwbxdjynljffowkxqi --yes
