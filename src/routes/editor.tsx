@@ -278,7 +278,7 @@ function MagicEditor() {
         <section className="order-1 flex min-h-[540px] flex-col items-center justify-center rounded-2xl border border-violet-100 bg-[#ece7f2] p-3 shadow-inner sm:p-6 lg:order-2">
           <div className="mb-3 flex w-full max-w-[430px] items-center justify-between gap-3 text-xs text-slate-500">
             <span>Pré-visualização do convite</span>
-            <select value={inviteId} onChange={(event) => setInviteId(event.target.value)} className="max-w-[190px] rounded-lg border bg-white px-2 py-1.5 text-xs">
+            <select value={inviteId} disabled={paidAccess} onChange={(event) => setInviteId(event.target.value)} className="max-w-[190px] rounded-lg border bg-white px-2 py-1.5 text-xs disabled:opacity-60">
               {invites.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </div>
