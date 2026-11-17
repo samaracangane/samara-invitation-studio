@@ -79,6 +79,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/editor': typeof EditorRoute
+  '/pagamentos': typeof PagamentosRoute
+  '/retorno': typeof RetornoRoute
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/contato': typeof ContatoRoute
@@ -88,6 +90,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/editor': typeof EditorRoute
+  '/pagamentos': typeof PagamentosRoute
+  '/retorno': typeof RetornoRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
