@@ -1,0 +1,26 @@
+name: Deploy Supabase config function
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy wiapy-config-status
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing GitHub Actions secret SUPABASE_ACCESS_TOKEN" && exit 1)
+          supabase functions deploy wiapy-config-status --project-ref plgwbxdjynljffowkxqi
