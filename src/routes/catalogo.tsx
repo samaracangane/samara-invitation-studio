@@ -8,7 +8,7 @@ import { CATEGORIES, invites } from "@/data/invites";
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
     meta: [
-      { title: "Catálogo de Convites — Convites Digitais" },
+      { title: "Catálogo de Convites — Samara’s Enchanted Invite" },
       { name: "description", content: "Encontre seu convite ideal: modelos infantis, casamento e 15 anos, em imagem e vídeo." },
       { property: "og:title", content: "Catálogo de Convites — Convites Digitais" },
       { property: "og:description", content: "Explore nosso catálogo de convites personalizáveis." },
