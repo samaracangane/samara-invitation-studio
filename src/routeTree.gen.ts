@@ -15,6 +15,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ConviteIdRouteImport } from './routes/convite.$id'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as EditorRouteImport } from './routes/editor'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,9 +47,15 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditorRoute = EditorRouteImport.update({
+  id: '/editor',
+  path: '/editor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
+  '/editor': typeof EditorRoute
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRoute
   '/contato': typeof ContatoRoute
@@ -76,8 +83,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -87,6 +94,7 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   ConviteIdRoute: typeof ConviteIdRoute
   AdminRoute: typeof AdminRoute
+  EditorRoute: typeof EditorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -133,6 +141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/editor': {
+      id: '/editor'
+      path: '/editor'
+      fullPath: '/editor'
+      preLoaderRoute: typeof EditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -143,6 +158,7 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   ConviteIdRoute: ConviteIdRoute,
   AdminRoute: AdminRoute,
+  EditorRoute: EditorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
