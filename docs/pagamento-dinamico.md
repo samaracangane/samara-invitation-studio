@@ -1,54 +1,72 @@
-# Pagamentos Wiapy — Samara’s Enchanted Invite
+# Pagamentos Wiapy e editor — Samara’s Enchanted Invite
 
-## Estado da integração
+## O que já está preparado no repositório
 
-Wiapy é o provedor escolhido para a loja. O banco está preparado para registrar pedidos Wiapy, mas **pagamentos reais ainda não estão ativados**: a documentação pública consultada descreve a criação de checkouts pelo painel, mas não documenta uma API pública para criar uma cobrança/checkout com valor arbitrário por pedido.
+- Tabela de ofertas Wiapy por faixa de preço (wiapy_offers).
+- Criação segura de pedido no servidor (create-checkout): o preço vem do catálogo Supabase, nunca do navegador.
+- Webhook Wiapy (wiapy-webhook) com autenticação pelo header Authorization.
+- Consulta privada do pedido (order-status) usando token de acesso individual.
+- Salvamento do projeto editado (save-design) somente depois de o pedido estar aprovado.
+- Página de retorno /retorno, editor /editor e painel de faixas Wiapy /pagamentos.
+- O editor permite textos em camadas, adesivos, mover elementos, ordenar, ocultar, bloquear, desfazer/refazer e exportar PNG/SVG após a aprovação do pedido.
 
-Não colocar tokens ou credenciais no frontend, no GitHub ou em mensagens.
+## Modelo de checkout sem cadastrar cada convite como produto
 
-## O que a documentação pública confirma
+A documentação pública da Wiapy informa que todo checkout precisa estar associado a um produto cadastrado; um checkout pode ter até 10 ofertas, cada uma com nome, preço e link próprio. O webhook envia payment.id, payment.status, payment.amount, checkout.id e customer.email. Os valores monetários são enviados em centavos e a autenticação do webhook usa o header Authorization.
 
-- Cada checkout precisa estar associado a um produto cadastrado.
-- O checkout define o valor e as formas de pagamento.
-- Um checkout pode ter até 10 ofertas com valores diferentes; cada oferta gera seu próprio link.
-- O webhook envia uma requisição HTTP POST em JSON e usa o token configurado no cabeçalho Authorization.
-- O payload do webhook contém payment.id, payment.status, payment.amount, checkout.id, customer e products. Valores monetários são enviados em centavos.
-- Status documentados: paid, unpaid, credit_card_declined, refunded e chargedback.
+Assim, a arquitetura preparada usa um produto digital genérico e ofertas por faixa de preço. Os convites que tiverem o mesmo preço reutilizam o mesmo link de oferta. Isso evita cadastrar um produto Wiapy para cada convite. Se a loja precisar de mais de 10 faixas de preço, será necessário configurar outro checkout ou simplificar os preços.
 
-Fontes oficiais:
-- https://help.wiapy.com/pt-br/article/como-criar-um-checkout-e-pegar-o-link-de-venda-1omdaab/
-- https://help.wiapy.com/pt-br/article/webhook-jtggmu/
+Fonte oficial do checkout: https://help.wiapy.com/pt-br/article/como-criar-um-checkout-e-pegar-o-link-de-venda-1omdaab/
+Fonte oficial do webhook: https://help.wiapy.com/pt-br/article/webhook-jtggmu/
 
-## Arquitetura proposta
+## Como o pedido funciona
 
-1. O cliente escolhe um convite; o navegador envia apenas o ID do convite.
-2. O servidor consulta o preço atual do convite no banco e cria um pedido pendente em centavos.
-3. O servidor seleciona o checkout Wiapy associado ao convite e redireciona o cliente.
-4. O webhook valida o cabeçalho Authorization e confere o checkout, valor, moeda e identificador do pedido com os dados guardados no servidor.
-5. O servidor processa o webhook de forma idempotente usando payment.id.
-6. Somente com status paid e correspondência integral do pedido o sistema libera o editor e o download.
+1. O cliente escolhe um convite e informa o e-mail.
+2. A função create-checkout consulta o convite ativo no Supabase e lê seu preço.
+3. A função encontra a oferta ativa de mesmo preço em wiapy_offers, cria o pedido pendente e gera um token individual de acesso.
+4. O cliente é enviado para o link da oferta Wiapy correspondente.
+5. A Wiapy chama wiapy-webhook com o evento de pagamento.
+6. O webhook confere o token Authorization e tenta identificar exatamente um pedido por checkout, valor e e-mail.
+7. Somente um pedido identificado sem ambiguidade pode ser marcado como aprovado.
+8. O cliente consulta o pedido em /retorno. O editor valida o token e o status; só pedidos aprovados podem exportar e salvar na nuvem.
 
-## Limitação que precisa ser resolvida antes de automatizar
+Proteção contra liberação errada: se houver zero ou mais de um pedido que corresponda ao evento, nenhum deles é liberado automaticamente. O evento fica registrado para reconciliação.
 
-A documentação pública confirma webhooks, mas não confirma endpoint de API para criar um checkout dinâmico por pedido nem um campo de referência externa para associar um pedido interno ao pagamento. Um único checkout compartilhado entre muitos convites não identifica, por si só, qual convite foi comprado.
+## Configuração necessária no painel
 
-Caminhos possíveis:
-- Solicitar à Wiapy a documentação da API de criação de checkout/pagamento com valor dinâmico e campo de referência externa; ou
-- Confirmar se é possível reutilizar um único produto genérico e criar checkouts/ofertas com identificadores individuais para cada convite. O webhook inclui checkout.id, que pode ser mapeado no banco para o convite.
+1. Na Wiapy, o responsável pela conta cria um produto digital genérico.
+2. Cria um checkout desse produto e configura as ofertas com os preços utilizados na loja (até 10 ofertas por checkout).
+3. Copia o ID do checkout e o link individual de cada oferta.
+4. No site, abre /pagamentos e cadastra cada faixa de preço, usando o ID do checkout e o link da oferta correspondente.
+5. No painel de integrações da Wiapy, configura o webhook para: https://SEU-PROJETO.supabase.co/functions/v1/wiapy-webhook
+6. Define um token próprio no campo de autenticação do webhook. O mesmo valor deve ser salvo como secret WIAPY_WEBHOOK_TOKEN no Supabase.
 
-Não implementar correspondência apenas por e-mail e valor: compras simultâneas do mesmo preço podem ser confundidas.
+O URL de retorno /retorno pode ser configurado como página externa de obrigado caso a configuração da Wiapy permita essa opção para o checkout. O cliente precisa retornar ao mesmo navegador onde iniciou o pedido, pois o token individual fica guardado localmente para proteger o acesso.
 
-## Segurança e titularidade
+## Publicação do Supabase
 
-- Segredos Wiapy e SUPABASE_SERVICE_ROLE_KEY ficam apenas em secrets do servidor/Edge Functions.
-- O preço e o estado do pedido são controlados no servidor, nunca pelo navegador.
-- Não liberar o editor apenas porque o cliente voltou à página de sucesso.
-- A conta de recebimento e a ativação da Wiapy devem ser feitas por um responsável adulto autorizado, seguindo os requisitos de idade e identidade do provedor.
+Um responsável autorizado com acesso ao projeto Supabase precisa aplicar a migration e publicar as funções. Com Supabase CLI instalado e o projeto correto vinculado:
 
-## Próximas tarefas
+```bash
+supabase login
+supabase link --project-ref SEU_PROJECT_REF
+supabase db push
+supabase secrets set WIAPY_WEBHOOK_TOKEN=SEU_TOKEN
+supabase functions deploy create-checkout
+supabase functions deploy wiapy-webhook
+supabase functions deploy order-status
+supabase functions deploy save-design
+```
 
-1. Obter da Wiapy a confirmação da API/identificador de referência ou do modelo de checkout individual.
-2. Implementar Edge Function para criar pedido e encaminhar ao checkout.
-3. Implementar webhook Wiapy com validação de Authorization, valor, checkout.id e idempotência.
-4. Liberar o editor apenas após pagamento confirmado.
-5. Testar com pagamento de teste antes de ativar vendas reais.
+O ambiente de Edge Functions também precisa ter SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY configurados como secrets. Nunca coloque a service role key, o token Wiapy ou senhas em arquivos do frontend, no GitHub ou em mensagens.
+
+A migration 20261117170000_wiapy_editor_access.sql cria as ofertas, os projetos salvos e o registro de eventos, além de inserir os cinco modelos com preço já existentes no catálogo atual. As imagens e os demais produtos da Paper Love Digital ainda precisam ser importados para o catálogo e para o Storage.
+
+## Limitações e cuidados
+
+- A documentação pública consultada não confirma uma API Wiapy para gerar um checkout com valor arbitrário por pedido. Por isso, esta integração usa links fixos por faixa de preço, com o servidor controlando o valor.
+- A associação do webhook depende de checkout ID, valor e e-mail. Pedidos simultâneos idênticos podem ficar sem correspondência automática; nesses casos não há liberação automática.
+- A função não envia e-mail de acesso. O cliente retorna pela página /retorno no mesmo navegador, ou o responsável pode definir outro fluxo de entrega depois.
+- O editor salva automaticamente no navegador. Após a confirmação e a publicação das funções, também salva o projeto no Supabase associado ao pedido.
+- A migration e as Edge Functions estão no GitHub, mas ainda precisam ser aplicadas/publicadas no projeto Supabase; o repositório sozinho não faz esse deploy.
+- A conta Wiapy, ativação de identidade, recebimentos e credenciais devem ser administrados por um responsável adulto autorizado, seguindo as regras da plataforma.
