@@ -128,7 +128,8 @@ function MagicEditor() {
 
   useEffect(() => {
     if (loadedFor !== inviteId) return;
-    localStorage.setItem("samara-design:" + inviteId, JSON.stringify(layers));
+    try { localStorage.setItem("samara-design:" + inviteId, JSON.stringify(layers)); }
+    catch { setNotice("O navegador está sem espaço para salvar mais elementos. Remova uma imagem e tente novamente."); }
   }, [layers, inviteId, loadedFor]);
 
   useEffect(() => {
@@ -164,7 +165,7 @@ function MagicEditor() {
   const addImage = (file?: File) => {
     if (!file) return;
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) { setNotice("Escolha uma imagem PNG, JPG ou WebP."); return; }
-    if (file.size > 1500000) { setNotice("A imagem deve ter até 1,5 MB para salvar no projeto."); return; }
+    if (file.size > 400000) { setNotice("A imagem deve ter até 400 KB para manter o projeto leve."); return; }
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result !== "string") return;
