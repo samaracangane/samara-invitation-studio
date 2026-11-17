@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, CircleAlert, Link2, LogIn, Save, ToggleLeft, ToggleRight } from "lucide-react";
+import { ArrowLeft, CheckCircle2, CircleAlert, Link2, LogIn, RefreshCw, Save, ToggleLeft, ToggleRight, ShieldCheck } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type Offer = { id: string; price_cents: number; checkout_id: string; checkout_url: string; is_active: boolean };
+type Diagnostics = { webhookTokenConfigured: boolean; serviceRoleConfigured: boolean };
 const money = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const Route = createFileRoute("/pagamentos")({
@@ -22,6 +23,8 @@ function PaymentSettings() {
   const [checkoutId, setCheckoutId] = useState("");
   const [checkoutUrl, setCheckoutUrl] = useState("");
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<Diagnostics | null>(null);
 
   useEffect(() => {
     if (!supabase) { setChecking(false); return; }
@@ -63,6 +66,24 @@ function PaymentSettings() {
     setMessage(error ? error.message : "Link enviado. Abra o e-mail neste mesmo dispositivo.");
   }
 
+  async function testServerConfiguration() {
+    if (!supabase || !authorized) return;
+    setTesting(true);
+    setMessage("");
+    const { data, error } = await supabase.functions.invoke("wiapy-config-status", { body: {} });
+    setTesting(false);
+    if (error || data?.error) {
+      setDiagnostics(null);
+      setMessage(data?.error || error?.message || "Não foi possível verificar o servidor. A função pode ainda não ter sido publicada no Supabase.");
+      return;
+    }
+    setDiagnostics({
+      webhookTokenConfigured: Boolean(data.webhookTokenConfigured),
+      serviceRoleConfigured: Boolean(data.serviceRoleConfigured),
+    });
+    setMessage("Verificação concluída. Veja os resultados abaixo.");
+  }
+
   async function saveOffer(event: FormEvent) {
     event.preventDefault();
     if (!supabase || !authorized) return;
@@ -98,7 +119,7 @@ function PaymentSettings() {
 
   async function logout() {
     await supabase?.auth.signOut();
-    setSession(null); setAuthorized(false); setOffers([]);
+    setSession(null); setAuthorized(false); setOffers([]); setDiagnostics(null);
   }
 
   return (
@@ -127,7 +148,17 @@ function PaymentSettings() {
           {authorized && (
             <>
               <div className="mt-6 flex justify-end"><button onClick={logout} className="text-xs text-slate-500 underline">Sair</button></div>
-              <form onSubmit={saveOffer} className="mt-4 grid gap-3 rounded-2xl bg-violet-50/70 p-4 sm:grid-cols-2">
+              <section className="mt-4 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
+                <div className="flex items-center gap-2"><ShieldCheck size={19} className="text-violet-700"/><h2 className="font-semibold">Verificação segura da integração</h2></div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Neste modelo, o cliente paga no checkout hospedado da Wiapy. A loja confirma o pagamento pelo webhook; por isso, não é necessário guardar uma chave de API da Wiapy no painel. O segredo do webhook fica somente nos Secrets do Supabase.</p>
+                <button type="button" disabled={testing} onClick={() => void testServerConfiguration()} className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><RefreshCw size={15} className={testing ? "animate-spin" : ""}/>{testing ? "Verificando..." : "Testar configuração segura"}</button>
+                {diagnostics && <div className="mt-3 space-y-2 rounded-xl bg-white p-3 text-sm">
+                  <p className="flex items-center gap-2">{diagnostics.webhookTokenConfigured ? <CheckCircle2 className="text-emerald-600" size={17}/> : <CircleAlert className="text-amber-600" size={17}/>} Secret WIAPY_WEBHOOK_TOKEN: {diagnostics.webhookTokenConfigured ? "configurado" : "não configurado"}</p>
+                  <p className="flex items-center gap-2">{diagnostics.serviceRoleConfigured ? <CheckCircle2 className="text-emerald-600" size={17}/> : <CircleAlert className="text-amber-600" size={17}/>} Credencial de servidor Supabase: {diagnostics.serviceRoleConfigured ? "disponível" : "não disponível"}</p>
+                  <p className="text-xs leading-5 text-slate-500">Este teste verifica a configuração do Supabase; não realiza cobrança nem confirma acesso à API privada da Wiapy.</p>
+                </div>}
+              </section>
+              <form onSubmit={saveOffer} className="mt-5 grid gap-3 rounded-2xl bg-violet-50/70 p-4 sm:grid-cols-2">
                 <label className="text-sm font-medium">Preço (R$)
                   <input value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Ex.: 25,00" inputMode="decimal" className="mt-1 w-full rounded-xl border bg-white px-3 py-3"/>
                 </label>
