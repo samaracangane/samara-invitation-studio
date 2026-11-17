@@ -53,7 +53,7 @@ Deno.serve(async (request) => {
         .eq("provider_checkout_id", String(checkout.id))
         .eq("amount_cents", payment.amount)
         .eq("customer_email", email)
-        .eq("payment_status", "pending")
+        .in("payment_status", ["pending", "rejected"])
         .limit(2);
       if (candidates?.length === 1) orderId = candidates[0].id;
     }
