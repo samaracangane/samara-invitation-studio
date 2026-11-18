@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { InviteCard } from "@/components/InviteCard";
 import { mapSupabaseInvite, type Invite } from "@/data/invites";
-import { supabase } from "@/lib/supabase";\nimport { useEffect, useState } from "react";\nimport { InviteCard } from "@/components/InviteCard";\nimport { mapSupabaseInvite, type Invite } from "@/data/invites";\nimport { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { ArrowRight, Heart, ShieldCheck, Sparkles, WandSparkles, Star, PartyPopper } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CATEGORIES } from "@/data/invites";
