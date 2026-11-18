@@ -39,19 +39,26 @@ Deno.serve(async (request) => {
     });
     const { data: orders, error } = await admin
       .from("orders")
-      .select("id,invite_name,amount_cents,payment_status,fulfillment_status,created_at,final_video_path")
-      .eq("customer_email", email)
+      .select("id,invite_name,amount_cents,payment_status,fulfillment_status,created_at,final_video_path,final_image_path,final_pdf_path")
+      .ilike("customer_email", email)
       .order("created_at", { ascending: false });
 
     if (error) return response({ error: "Não foi possível carregar seus pedidos." }, 500);
 
     const result = await Promise.all((orders ?? []).map(async (order) => {
-      let downloadUrl: string | null = null;
-      if (order.payment_status === "approved" && order.final_video_path) {
-        const { data } = await admin.storage
-          .from("customer-deliveries")
-          .createSignedUrl(order.final_video_path, 60 * 60);
-        downloadUrl = data?.signedUrl ?? null;
+      const assets: { type: string; label: string; downloadUrl: string }[] = [];
+      if (order.payment_status === "approved") {
+        const candidates = [
+          { path: order.final_video_path, type: "video", label: "Baixar convite MP4" },
+          { path: order.final_image_path, type: "image", label: "Baixar imagem" },
+          { path: order.final_pdf_path, type: "pdf", label: "Baixar PDF" },
+        ];
+        for (const asset of candidates) {
+          if (!asset.path) continue;
+          const { data } = await admin.storage.from("customer-deliveries")
+            .createSignedUrl(asset.path, 60 * 60, { download: true });
+          if (data?.signedUrl) assets.push({ type: asset.type, label: asset.label, downloadUrl: data.signedUrl });
+        }
       }
       return {
         id: order.id,
@@ -60,7 +67,7 @@ Deno.serve(async (request) => {
         paymentStatus: order.payment_status,
         fulfillmentStatus: order.fulfillment_status,
         createdAt: order.created_at,
-        downloadUrl,
+        assets,
       };
     }));
 
