@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCard } from "@/components/InviteCard";
-import { CATEGORIES, invites, mapSupabaseInvite, type Invite } from "@/data/invites";
+import { CATEGORIES, mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/catalogo")({
 function Catalogo() {
   const [cat, setCat] = useState<string>("Todos");
   const [search, setSearch] = useState("");
-  const [catalogInvites, setCatalogInvites] = useState<Invite[]>(invites);
+  const [catalogInvites, setCatalogInvites] = useState<Invite[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -32,14 +32,9 @@ function Catalogo() {
         .select("slug,name,category,description,price,image_url,video_url,fields")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
-      if (!alive || error || !data) return;
-
-      const dynamicInvites = data.map((row) => mapSupabaseInvite(row));
-      const dynamicIds = new Set(dynamicInvites.map((invite) => invite.id));
-      setCatalogInvites([
-        ...dynamicInvites,
-        ...invites.filter((invite) => !dynamicIds.has(invite.id)),
-      ]);
+      if (!alive) return;
+      if (error || !data) { setCatalogInvites([]); return; }
+      setCatalogInvites(data.map((row) => mapSupabaseInvite(row)));
     }
     void loadInvites();
     return () => { alive = false; };
