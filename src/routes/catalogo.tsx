@@ -24,7 +24,7 @@ const CATEGORY_ART: Record<string, string> = {
   "Princesas": "👑", "Super Herói": "🦸", "Fundo do Mar": "🧜‍♀️",
   "Dinossauro": "🦕", "Toy Story": "🚀", "Barbie": "💖", "Hello Kitty": "🎀",
   "Fazendinha": "🐮", "Circo": "🎪", "Safari": "🦁",
-  "Jardim Encantado": "🦋", "365 Sorrisos": "🌈",
+  "Jardim Encantado": "🦋", "365 Sorrisos": "🌈", "Patrulha Canina": "🐾",
 };
 
 function Catalogo() {
@@ -67,19 +67,19 @@ function Catalogo() {
           <p className="mt-3 max-w-xl text-base leading-7 text-muted-foreground">Explore os modelos, escolha seu favorito e deixe os detalhes da sua festa ainda mais especiais.</p>
         </div>
       </section>
-      <div className="mx-auto max-w-6xl px-5 py-10 md:py-12">
+      <div className="mx-auto max-w-6xl bg-[#fffafd] px-5 py-10 md:py-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><h2 className="font-display text-3xl font-semibold">Todos os modelos</h2><p className="mt-1 text-sm text-muted-foreground">Use a busca ou escolha uma categoria.</p></div>
+          <div><h2 className="font-display text-3xl font-semibold">Categorias encantadoras</h2><p className="mt-1 text-sm text-muted-foreground">Escolha o tema da sua comemoração.</p></div>
           <span className="rounded-full bg-secondary px-4 py-2 text-sm font-medium text-primary">{list.length} {list.length === 1 ? "modelo" : "modelos"}</span>
         </div>
         <div className="mt-7 flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:flex-row sm:items-center">
           <div className="flex min-w-0 flex-1 items-center gap-3 rounded-xl bg-muted/70 px-4 py-3"><Search className="h-5 w-5 shrink-0 text-primary" aria-hidden="true"/><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por tema, nome ou ocasião..." aria-label="Buscar convites" className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"/>{search && <button type="button" onClick={() => setSearch("")} aria-label="Limpar busca" className="text-muted-foreground hover:text-primary"><X className="h-4 w-4"/></button>}</div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><SlidersHorizontal className="h-4 w-4 text-primary"/> Categorias</div>
         </div>
-        <div className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7">
-          {CATEGORIES.map((category) => <button key={category} type="button" onClick={() => setCat(category)} aria-pressed={cat === category} className="group flex min-w-0 flex-col items-center gap-2 text-center">
-            <span className={`flex h-20 w-20 items-center justify-center rounded-full border-2 text-3xl shadow-sm transition-all group-hover:-translate-y-1 group-hover:shadow-md ${cat === category ? "border-primary bg-primary/10 ring-4 ring-primary/15" : "border-border bg-card"}`}>{CATEGORY_ART[category]}</span>
-            <span className={`text-xs font-semibold leading-tight ${cat === category ? "text-primary" : "text-foreground"}`}>{category}</span>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
+          {CATEGORIES.map((category) => <button key={category} type="button" onClick={() => setCat(category)} aria-pressed={cat === category} className={`group flex min-h-[158px] min-w-0 flex-col items-center justify-center gap-3 rounded-[28px] border bg-white px-3 py-5 text-center shadow-[0_8px_24px_-18px_rgba(60,35,70,.25)] transition-all hover:-translate-y-1 hover:shadow-md ${cat === category ? "border-primary ring-2 ring-primary/20" : "border-[#f0eaf0]"}`}>
+            <span className={`flex h-[82px] w-[82px] items-center justify-center rounded-full text-4xl shadow-inner ${cat === category ? "bg-primary/10" : "bg-[#fff0f7]"}`}>{CATEGORY_ART[category]}</span>
+            <span className={`text-base font-medium leading-tight text-[#665866] ${cat === category ? "text-primary" : ""}`}>{category}</span>
           </button>)}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
