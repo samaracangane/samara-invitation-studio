@@ -10,19 +10,19 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type InviteRow = {
   id: string; slug: string; name: string;
-  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string; price: number; image_url: string | null;
   video_url: string | null; is_active: boolean;
 };
 type Draft = {
   id?: string; slug: string; name: string;
-  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string; price: string; image_url: string;
   video_url: string; is_active: boolean;
 };
-const CATEGORY_OPTIONS = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos"] as const;
+const CATEGORY_OPTIONS = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos","Patrulha Canina"] as const;
 const emptyDraft = (): Draft => ({
-  slug: "", name: "", category: "Infantil", description: "",
+  slug: "", name: "", category: "Mickey", description: "",
   price: "25", image_url: "", video_url: "", is_active: true,
 });
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
