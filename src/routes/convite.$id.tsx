@@ -12,7 +12,7 @@ export const Route = createFileRoute("/convite/$id")({
     if (!supabase) throw notFound();
     const { data } = await supabase
       .from("invites")
-      .select("slug,name,category,description,price,image_url,video_url,fields")
+      .select("slug,name,category,description,price,image_url,image_urls,video_url,fields")
       .eq("slug", params.id)
       .eq("is_active", true)
       .maybeSingle();
@@ -35,6 +35,8 @@ export const Route = createFileRoute("/convite/$id")({
 function InviteProduct() {
   const { invite } = Route.useLoaderData();
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerWhatsapp, setCustomerWhatsapp] = useState("");
+  const [selectedImage, setSelectedImage] = useState(invite.image);
   const [eventName, setEventName] = useState("");
   const [eventAge, setEventAge] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -140,7 +142,7 @@ function InviteProduct() {
                 <label className="block text-sm font-semibold">Observações ou mensagem extra
                   <textarea value={eventMessage} onChange={(event) => setEventMessage(event.target.value)} maxLength={500} rows={3} placeholder="Informações adicionais para colocar no convite..." className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
                 </label>
-                <label className="block text-sm font-semibold">Seu e-mail *
+                <label className="block text-sm font-semibold">WhatsApp com DDD *\n                  <input required type="tel" inputMode="tel" autoComplete="tel" value={customerWhatsapp} onChange={(event) => setCustomerWhatsapp(event.target.value)} maxLength={20} placeholder="(11) 99999-9999" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Obrigatório para contato sobre seu pedido.</span>\n                </label>\n                <label className="block text-sm font-semibold">Seu e-mail *
                   <input required type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
                 </label>
               </div>
