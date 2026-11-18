@@ -113,7 +113,7 @@ function MinhaConta() {
                   </article>)}
                 </div>
               ) : <p className="mt-4 rounded-xl bg-secondary/60 p-4 text-sm text-muted-foreground">{message || "Nenhum pedido encontrado."}</p>}
-              <button onClick={() => void supabase.auth.signOut()} className="mt-6 text-sm font-medium text-muted-foreground underline">Sair da conta</button>
+              <button onClick={() => void supabase?.auth.signOut()} className="mt-6 text-sm font-medium text-muted-foreground underline">Sair da conta</button>
             </section>
           )}
         </div>

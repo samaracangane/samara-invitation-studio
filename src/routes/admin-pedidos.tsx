@@ -116,7 +116,7 @@ function AdminPedidos() {
       <div className="mx-auto max-w-4xl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div><p className="text-xs font-semibold uppercase tracking-wider text-violet-500">Painel administrativo</p><h1 className="mt-1 font-display text-3xl font-semibold">Pedidos e entregas</h1><p className="mt-2 text-sm text-slate-500">Envie o convite pronto em vídeo, imagem ou PDF. A cliente verá os arquivos na área Minha conta.</p></div>
-          <div className="flex gap-2"><a href="/admin" className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700">Voltar ao painel</a><button onClick={() => void supabase.auth.signOut()} className="rounded-full border border-violet-200 bg-white p-2 text-violet-700" aria-label="Sair"><LogOut size={17}/></button></div>
+          <div className="flex gap-2"><a href="/admin" className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700">Voltar ao painel</a><button onClick={() => void supabase?.auth.signOut()} className="rounded-full border border-violet-200 bg-white p-2 text-violet-700" aria-label="Sair"><LogOut size={17}/></button></div>
         </header>
         {message && <p role="status" className="mt-5 rounded-xl bg-white p-4 text-sm text-violet-800 shadow-sm">{message}</p>}
         <section className="mt-6 space-y-3">
