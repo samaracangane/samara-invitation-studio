@@ -37,8 +37,6 @@ function InviteProduct() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerWhatsapp, setCustomerWhatsapp] = useState("");
   const [selectedImage, setSelectedImage] = useState(invite.image);
-  const [customerWhatsapp, setCustomerWhatsapp] = useState("");
-  const [selectedImage, setSelectedImage] = useState(invite.image);
   const [eventName, setEventName] = useState("");
   const [eventAge, setEventAge] = useState("");
   const [eventDate, setEventDate] = useState("");
