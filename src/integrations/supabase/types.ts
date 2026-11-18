@@ -29,11 +29,24 @@ export type Database = {
         }
         Relationships: []
       }
-lovable-sync
-      invites: {
+      category_media: {
         Row: {
           category: string
-
+          image_url: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          image_url: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          image_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invite_designs: {
         Row: {
           design_json: Json
@@ -70,12 +83,12 @@ lovable-sync
         Row: {
           category: string
           checkout_url: string | null
-main
           created_at: string
           description: string
           fields: Json
           id: string
           image_url: string | null
+          image_urls: string[]
           is_active: boolean
           name: string
           price: number
@@ -85,15 +98,13 @@ main
         }
         Insert: {
           category: string
- lovable-sync
-
           checkout_url?: string | null
-main
           created_at?: string
           description?: string
           fields?: Json
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           is_active?: boolean
           name: string
           price?: number
@@ -103,15 +114,13 @@ main
         }
         Update: {
           category?: string
-lovable-sync
-
           checkout_url?: string | null
-main
           created_at?: string
           description?: string
           fields?: Json
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           is_active?: boolean
           name?: string
           price?: number
@@ -121,8 +130,6 @@ main
         }
         Relationships: []
       }
-lovable-sync
-
       orders: {
         Row: {
           access_token_hash: string | null
@@ -132,6 +139,7 @@ lovable-sync
           currency: string
           customer_email: string | null
           customer_name: string | null
+          customer_whatsapp: string | null
           event_details: Json
           final_image_path: string | null
           final_pdf_path: string | null
@@ -158,6 +166,7 @@ lovable-sync
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          customer_whatsapp?: string | null
           event_details?: Json
           final_image_path?: string | null
           final_pdf_path?: string | null
@@ -184,6 +193,7 @@ lovable-sync
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          customer_whatsapp?: string | null
           event_details?: Json
           final_image_path?: string | null
           final_pdf_path?: string | null
@@ -280,7 +290,6 @@ lovable-sync
           },
         ]
       }
- main
     }
     Views: {
       [_ in never]: never
