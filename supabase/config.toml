@@ -1,1 +1,8 @@
+lovable-sync
 project_id = "plgwbxdjynljffowkxqi"
+
+project_id = "samara-invitation-studio"
+
+[functions.wiapy-webhook]
+verify_jwt = false
+ main

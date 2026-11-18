@@ -27,21 +27,22 @@ export type TextField = {
 export type Invite = {
   id: string;
   name: string;
-  category: "Infantil" | "Casamento" | "15 Anos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string;
   price: string;
   image: string;
+  images?: string[];
   video?: string | undefined;
   fields: TextField[];
 };
 
-export const CATEGORIES = ["Infantil", "Casamento", "15 Anos"] as const;
+export const CATEGORIES = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos","Patrulha Canina"] as const;
 
 export const invites: Invite[] = [
   {
     id: "micaela-kpop-demon-hunters",
     name: "Convite Micaela — K-Pop Demon Hunters",
-    category: "Infantil",
+    category: "Guerreiras K-Pop",
     description: "Convite digital temático K-Pop Demon Hunters, com arte em tons neon de rosa e roxo. Personalizado com nome, idade, data, horário e local da festa.",
     price: "Consulte o valor",
     image: micaelaKpop,
@@ -50,7 +51,7 @@ export const invites: Invite[] = [
   {
     id: "idol-pop-animado",
     name: "Idol Pop Estrelinha (Animado)",
-    category: "Infantil",
+    category: "Desenhos Animados",
     description: "Convite animado com pétalas e brilhos em movimento. Ideal para festas temáticas pop.",
     price: "R$ 45,00",
     image: idol,
@@ -66,7 +67,7 @@ export const invites: Invite[] = [
   {
     id: "idol-pop",
     name: "Idol Pop Estrelinha",
-    category: "Infantil",
+    category: "Safari",
     description: "Versão em imagem do convite Idol Pop, pronta para WhatsApp.",
     price: "R$ 25,00",
     image: idol,
@@ -75,7 +76,7 @@ export const invites: Invite[] = [
   {
     id: "casamento-rosas",
     name: "Rosas & Eucalipto",
-    category: "Casamento",
+    category: "Jardim Encantado",
     description: "Aquarela delicada com moldura dourada. Elegância atemporal.",
     price: "R$ 35,00",
     image: casamento,
@@ -91,7 +92,7 @@ export const invites: Invite[] = [
   {
     id: "15-anos-coroa",
     name: "Coroa Dourada",
-    category: "15 Anos",
+    category: "Princesas",
     description: "Azul noite com coroa e brilhos dourados para uma debutante inesquecível.",
     price: "R$ 35,00",
     image: quinze,
@@ -105,7 +106,7 @@ export const invites: Invite[] = [
   {
     id: "safari-baby",
     name: "Safari Baby",
-    category: "Infantil",
+    category: "Safari",
     description: "Bichinhos fofos da selva e balões coloridos.",
     price: "R$ 25,00",
     image: safari,
@@ -124,3 +125,30 @@ invites[1]!.fields = invites[0]!.fields;
 export const getInvite = (id: string) => invites.find((i) => i.id === id);
 
 export const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+
+export type SupabaseInviteRow = {
+  slug: string;
+  name: string;
+  category: Invite["category"];
+  description: string | null;
+  price: number | string;
+  image_url: string | null;
+  image_urls?: string[] | null;
+  video_url: string | null;
+  fields: unknown;
+};
+
+export function mapSupabaseInvite(row: SupabaseInviteRow): Invite {
+  return {
+    id: row.slug,
+    name: row.name,
+    category: row.category,
+    description: row.description ?? "",
+    price: Number(row.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+    image: row.image_url || row.image_urls?.[0] || invites[0]!.image,
+    images: row.image_urls?.length ? row.image_urls : (row.image_url ? [row.image_url] : []),
+    video: row.video_url || undefined,
+    fields: Array.isArray(row.fields) ? row.fields as TextField[] : [],
+  };
+}

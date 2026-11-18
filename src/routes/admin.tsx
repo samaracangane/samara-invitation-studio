@@ -4,30 +4,31 @@ import {
   BadgeCheck, BarChart3, Check, ChevronRight, CirclePlus, ClipboardList,
   Crown, FileImage, FolderOpen, Gem, LayoutDashboard, LogOut, Menu,
   Package, Pencil, Plus, Save, Search, Settings, ShieldCheck, Sparkles,
-  Trash2, Upload, Users, X,
+  Trash2, Upload, Users, X, CreditCard,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type InviteRow = {
   id: string; slug: string; name: string;
-  category: "Infantil" | "Casamento" | "15 Anos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string; price: number; image_url: string | null;
   video_url: string | null; is_active: boolean;
 };
 type Draft = {
   id?: string; slug: string; name: string;
-  category: "Infantil" | "Casamento" | "15 Anos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string; price: string; image_url: string;
   video_url: string; is_active: boolean;
 };
+const CATEGORY_OPTIONS = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos","Patrulha Canina"] as const;
 const emptyDraft = (): Draft => ({
-  slug: "", name: "", category: "Infantil", description: "",
+  slug: "", name: "", category: "Mickey", description: "",
   price: "25", image_url: "", video_url: "", is_active: true,
 });
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Painel administrativo — Convites Digitais" }] }),
+  head: () => ({ meta: [{ title: "Painel administrativo — Samara’s Enchanted Invite" }] }),
   component: AdminPage,
 });
 
@@ -42,6 +43,8 @@ function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [categoryPhoto, setCategoryPhoto] = useState<string>(CATEGORY_OPTIONS[0]);
+  const [categoryPhotoUrls, setCategoryPhotoUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!supabase) { setChecking(false); return; }
@@ -66,6 +69,8 @@ function AdminPage() {
         setMessage("Este e-mail ainda não foi liberado como administrador. Verifique a configuração no Supabase.");
       } else {
         setAuthorized(true); setMessage("");
+        const { data: categoryMedia } = await supabase.from("category_media").select("category,image_url");
+        if (categoryMedia) setCategoryPhotoUrls(Object.fromEntries(categoryMedia.map((item) => [item.category, item.image_url])));
         const { data: invites, error: listError } = await supabase.from("invites")
           .select("id,slug,name,category,description,price,image_url,video_url,is_active")
           .order("created_at", { ascending: false });
@@ -81,11 +86,10 @@ function AdminPage() {
   }, [session]);
 
   const activeCount = useMemo(() => rows.filter((item) => item.is_active).length, [rows]);
-  const categoryCounts = useMemo(() => [
-    { name: "Infantil", count: rows.filter((item) => item.category === "Infantil").length, color: "bg-violet-500" },
-    { name: "Casamento", count: rows.filter((item) => item.category === "Casamento").length, color: "bg-pink-500" },
-    { name: "15 Anos", count: rows.filter((item) => item.category === "15 Anos").length, color: "bg-amber-500" },
-  ], [rows]);
+  const categoryCounts = useMemo(() => CATEGORY_OPTIONS.map((name, index) => ({
+    name, count: rows.filter((item) => item.category === name).length,
+    color: ["bg-violet-500", "bg-pink-500", "bg-amber-500", "bg-fuchsia-500"][index % 4],
+  })), [rows]);
   const filteredRows = useMemo(() => rows.filter((row) =>
     (row.name + " " + row.category).toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))
   ), [rows, query]);
@@ -110,6 +114,19 @@ function AdminPage() {
     const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
     setDraft((current) => ({ ...current, [kind === "image" ? "image_url" : "video_url"]: data.publicUrl }));
     setMessage(kind === "image" ? "Imagem enviada com sucesso." : "Vídeo enviado com sucesso.");
+  }
+
+  async function uploadCategoryPhoto(file: File) {
+    if (!supabase || !session?.user) return;
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
+    const path = `${session.user.id}/categorias/${Date.now()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage.from("invite-media").upload(path, file, { upsert: true });
+    if (uploadError) { setMessage(uploadError.message); return; }
+    const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
+    const { error } = await supabase.from("category_media").upsert({ category: categoryPhoto, image_url: data.publicUrl, updated_at: new Date().toISOString() });
+    if (error) { setMessage(error.message); return; }
+    setCategoryPhotoUrls((current) => ({ ...current, [categoryPhoto]: data.publicUrl }));
+    setMessage(`Foto da categoria ${categoryPhoto} salva com sucesso.`);
   }
 
   async function saveInvite(event: FormEvent) {
@@ -175,7 +192,7 @@ function AdminPage() {
       <aside className={`${menuOpen ? "block" : "hidden"} fixed inset-y-0 left-0 z-40 w-[270px] flex-col bg-gradient-to-b from-[#281b3d] via-[#302044] to-[#21182f] px-5 py-7 text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:h-screen lg:shrink-0`}>
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-amber-300"><Crown size={29}/></div>
-          <div><p className="font-display text-2xl leading-none">Convites</p><p className="mt-1 text-[10px] font-semibold uppercase tracking-[.28em] text-violet-200">Digitais</p></div>
+          <div><p className="font-display text-xl leading-none">Samara’s</p><p className="mt-1 text-[10px] font-semibold uppercase tracking-[.2em] text-violet-200">Enchanted Invite</p></div>
         </div>
         <p className="mb-8 mt-5 px-2 text-xs leading-5 text-violet-200/75">Transforme momentos em lembranças especiais.</p>
         <nav className="space-y-2 text-sm">
@@ -183,6 +200,8 @@ function AdminPage() {
           <a href="#cadastro" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><CirclePlus size={18}/> Cadastrar convite</a>
           <a href="#catalogo" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><FolderOpen size={18}/> Meus convites</a>
           <a href="#categorias" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><BarChart3 size={18}/> Categorias</a>
+          <a href="/pagamentos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><CreditCard size={18}/> Pagamentos Wiapy</a>
+          <a href="/admin-pedidos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><Package size={18}/> Pedidos e entregas</a>
         </nav>
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[.07] p-4">
           <div className="mb-2 flex items-center gap-2 text-amber-300"><Sparkles size={16}/><span className="text-xs font-semibold">Sua loja em destaque</span></div>
@@ -222,6 +241,17 @@ function AdminPage() {
             </div>
             {rows.length===0 && <p className="mt-5 rounded-xl bg-violet-50 p-3 text-xs text-violet-700">Assim que você cadastrar convites, os dados aparecerão aqui.</p>}
           </section>
+          <section className="mt-5 rounded-2xl border border-violet-100/80 bg-white p-5 shadow-[0_8px_30px_-22px_rgba(61,37,91,.25)] sm:p-6">
+            <div><h2 className="text-lg font-semibold">Fotos das categorias</h2><p className="mt-1 text-xs text-slate-500">Escolha uma categoria e envie a imagem que aparecerá na página inicial.</p></div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr]">
+              <label className="block text-sm font-medium text-slate-700">Categoria
+                <select value={categoryPhoto} onChange={e=>setCategoryPhoto(e.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3">{CATEGORY_OPTIONS.map(category=><option key={category}>{category}</option>)}</select>
+              </label>
+              <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-3 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-violet-600"/> Enviar foto da categoria</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>e.target.files?.[0] && void uploadCategoryPhoto(e.target.files[0])} className="mt-2 block w-full text-xs"/></label>
+            </div>
+            {categoryPhotoUrls[categoryPhoto] && <img src={categoryPhotoUrls[categoryPhoto]} alt={categoryPhoto} className="mt-4 h-28 w-28 rounded-2xl border object-cover"/>}
+          </section>
+
           <section className="rounded-2xl border border-violet-100/80 bg-white p-5 shadow-[0_8px_30px_-22px_rgba(61,37,91,.25)] sm:p-6">
             <div className="flex items-center gap-2"><Sparkles className="text-amber-500"/><h2 className="text-lg font-semibold">Ações rápidas</h2></div>
             <div className="mt-5 grid grid-cols-2 gap-3">
@@ -240,7 +270,7 @@ function AdminPage() {
               <label className="block text-sm font-medium text-slate-700">Nome do convite<input required value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})} placeholder="Ex.: Jardim Encantado" className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-50"/></label>
               <label className="block text-sm font-medium text-slate-700">Identificador (slug)<input value={draft.slug} onChange={e=>setDraft({...draft,slug:e.target.value})} placeholder="Gerado automaticamente" className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-50"/></label>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-slate-700">Categoria<select value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value as Draft["category"]})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"><option>Infantil</option><option>Casamento</option><option>15 Anos</option></select></label>
+                <label className="block text-sm font-medium text-slate-700">Categoria<select value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value as Draft["category"]})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3">{CATEGORY_OPTIONS.map((category) => <option key={category}>{category}</option>)}</select></label>
                 <label className="block text-sm font-medium text-slate-700">Preço (R$)<input required type="number" min="0" step="0.01" value={draft.price} onChange={e=>setDraft({...draft,price:e.target.value})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"/></label>
               </div>
               <label className="block text-sm font-medium text-slate-700">Descrição<textarea value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} rows={3} placeholder="Conte um pouco sobre este modelo..." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400"/></label>

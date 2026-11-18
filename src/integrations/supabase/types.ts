@@ -29,9 +29,48 @@ export type Database = {
         }
         Relationships: []
       }
+lovable-sync
       invites: {
         Row: {
           category: string
+
+      invite_designs: {
+        Row: {
+          design_json: Json
+          id: string
+          invite_id: string
+          order_id: string
+          updated_at: string
+        }
+        Insert: {
+          design_json?: Json
+          id?: string
+          invite_id: string
+          order_id: string
+          updated_at?: string
+        }
+        Update: {
+          design_json?: Json
+          id?: string
+          invite_id?: string
+          order_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_designs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invites: {
+        Row: {
+          category: string
+          checkout_url: string | null
+main
           created_at: string
           description: string
           fields: Json
@@ -46,6 +85,10 @@ export type Database = {
         }
         Insert: {
           category: string
+ lovable-sync
+
+          checkout_url?: string | null
+main
           created_at?: string
           description?: string
           fields?: Json
@@ -60,6 +103,10 @@ export type Database = {
         }
         Update: {
           category?: string
+lovable-sync
+
+          checkout_url?: string | null
+main
           created_at?: string
           description?: string
           fields?: Json
@@ -74,6 +121,166 @@ export type Database = {
         }
         Relationships: []
       }
+lovable-sync
+
+      orders: {
+        Row: {
+          access_token_hash: string | null
+          amount_cents: number
+          checkout_url: string | null
+          created_at: string
+          currency: string
+          customer_email: string | null
+          customer_name: string | null
+          event_details: Json
+          final_image_path: string | null
+          final_pdf_path: string | null
+          final_video_path: string | null
+          fulfilled_at: string | null
+          fulfillment_status: string
+          id: string
+          idempotency_key: string
+          invite_id: string
+          invite_name: string
+          offer_id: string | null
+          paid_at: string | null
+          payment_provider: string
+          payment_status: string
+          provider_checkout_id: string | null
+          provider_payment_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token_hash?: string | null
+          amount_cents: number
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          event_details?: Json
+          final_image_path?: string | null
+          final_pdf_path?: string | null
+          final_video_path?: string | null
+          fulfilled_at?: string | null
+          fulfillment_status?: string
+          id?: string
+          idempotency_key: string
+          invite_id: string
+          invite_name: string
+          offer_id?: string | null
+          paid_at?: string | null
+          payment_provider?: string
+          payment_status?: string
+          provider_checkout_id?: string | null
+          provider_payment_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token_hash?: string | null
+          amount_cents?: number
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          event_details?: Json
+          final_image_path?: string | null
+          final_pdf_path?: string | null
+          final_video_path?: string | null
+          fulfilled_at?: string | null
+          fulfillment_status?: string
+          id?: string
+          idempotency_key?: string
+          invite_id?: string
+          invite_name?: string
+          offer_id?: string | null
+          paid_at?: string | null
+          payment_provider?: string
+          payment_status?: string
+          provider_checkout_id?: string | null
+          provider_payment_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "wiapy_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wiapy_offers: {
+        Row: {
+          checkout_id: string
+          checkout_url: string
+          created_at: string
+          id: string
+          is_active: boolean
+          price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          checkout_id: string
+          checkout_url: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          checkout_id?: string
+          checkout_url?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          price_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wiapy_webhook_events: {
+        Row: {
+          amount_cents: number | null
+          id: string
+          matched_order_id: string | null
+          provider_checkout_id: string | null
+          provider_payment_id: string
+          provider_status: string
+          received_at: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          id?: string
+          matched_order_id?: string | null
+          provider_checkout_id?: string | null
+          provider_payment_id: string
+          provider_status: string
+          received_at?: string
+        }
+        Update: {
+          amount_cents?: number | null
+          id?: string
+          matched_order_id?: string | null
+          provider_checkout_id?: string | null
+          provider_payment_id?: string
+          provider_status?: string
+          received_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiapy_webhook_events_matched_order_id_fkey"
+            columns: ["matched_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+ main
     }
     Views: {
       [_ in never]: never

@@ -1,35 +1,32 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Instagram, ArrowRight } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
-import { INSTAGRAM, waLink } from "@/data/invites";
+import { INSTAGRAM } from "@/data/invites";
 
 export const Route = createFileRoute("/contato")({
   head: () => ({
     meta: [
-      { title: "Contato — Convites Digitais" },
-      { name: "description", content: "Peça seu orçamento de convite pelo WhatsApp." },
-      { property: "og:title", content: "Contato — Convites Digitais" },
-      { property: "og:description", content: "Fale com nossa equipe e peça seu orçamento." },
+      { title: "Contato — Samara Invitation Studio" },
+      { name: "description", content: "Acompanhe a Samara Invitation Studio no Instagram." },
+      { property: "og:title", content: "Contato — Samara Invitation Studio" },
+      { property: "og:description", content: "Acompanhe novidades e inspirações para sua comemoração." },
     ],
   }),
   component: Contato,
 });
 
 function Contato() {
-  const [nome, setNome] = useState("");
-  const [msg, setMsg] = useState("");
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-xl px-4 py-16">
-        <h1 className="font-display text-5xl">Contato</h1>
-        <p className="mt-3 text-muted-foreground">Conte sobre a sua festa e enviaremos o orçamento.</p>
-        <form className="mt-8 space-y-4" onSubmit={(e) => { e.preventDefault(); window.open(waLink(`Olá, sou ${nome}. ${msg}`), "_blank"); }}>
-          <input required value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome" className="w-full rounded-md border bg-card px-3 py-2" />
-          <textarea required value={msg} onChange={(e) => setMsg(e.target.value)} rows={5} placeholder="Tipo de festa, data, quantidade…" className="w-full rounded-md border bg-card px-3 py-2" />
-          <button className="rounded-full bg-primary px-6 py-3 text-primary-foreground">Enviar pelo WhatsApp</button>
-        </form>
-        <p className="mt-8 text-sm">Instagram: <a className="text-primary" href={`https://instagram.com/${INSTAGRAM}`}>@{INSTAGRAM}</a></p>
-      </div>
+      <section className="mx-auto max-w-3xl px-5 py-20 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary text-primary"><Instagram className="h-8 w-8" /></div>
+        <h1 className="mt-6 font-display text-5xl font-semibold">Vamos nos conectar?</h1>
+        <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Acompanhe nosso Instagram para ver novidades, inspirações e lançamentos de convites digitais.</p>
+        <a href={`https://instagram.com/${INSTAGRAM}`} target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 font-semibold text-primary-foreground shadow-md transition hover:-translate-y-0.5">
+          <Instagram className="h-5 w-5" /> Acompanhar no Instagram
+        </a>
+        <div className="mt-12"><Link to="/catalogo" className="inline-flex items-center gap-2 font-semibold text-primary hover:underline">Explorar catálogo <ArrowRight className="h-4 w-4" /></Link></div>
+      </section>
     </SiteLayout>
   );
 }

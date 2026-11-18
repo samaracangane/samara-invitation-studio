@@ -1,0 +1,46 @@
+name: Deploy Supabase payment functions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: v2.stable
+
+      - name: Deploy wiapy-config-status
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing GitHub Actions secret SUPABASE_ACCESS_TOKEN" && exit 1)
+          supabase functions deploy wiapy-config-status --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy wiapy-webhook
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy wiapy-webhook --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy create-checkout
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy create-checkout --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy order-status
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy order-status --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy customer-orders
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy customer-orders --project-ref plgwbxdjynljffowkxqi --yes
