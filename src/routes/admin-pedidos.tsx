@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, FileVideo, LogOut, Upload } from "lucide-react";
+import { ArrowLeft, FileImage, FileText, FileVideo, LogOut, Upload } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type OrderRow = {
@@ -11,6 +11,14 @@ type OrderRow = {
   fulfillment_status: string;
   created_at: string;
 };
+
+const deliveryTypes = {
+  video: { label: "MP4", column: "final_video_path", extension: "mp4", mime: "video/mp4", max: 100 * 1024 * 1024 },
+  image: { label: "Imagem", column: "final_image_path", extension: "jpg", mime: ["image/jpeg", "image/png", "image/webp"], max: 20 * 1024 * 1024 },
+  pdf: { label: "PDF", column: "final_pdf_path", extension: "pdf", mime: "application/pdf", max: 20 * 1024 * 1024 },
+} as const;
+
+type DeliveryKind = keyof typeof deliveryTypes;
 
 export const Route = createFileRoute("/admin-pedidos")({
   head: () => ({ meta: [{ title: "Entregas de convites — Samara’s Enchanted Invite" }] }),
@@ -54,30 +62,33 @@ function AdminPedidos() {
     return () => { alive = false; };
   }, [session]);
 
-  async function deliver(order: OrderRow, file?: File) {
+  async function deliver(order: OrderRow, kind: DeliveryKind, file?: File) {
     if (!supabase || !file) return;
-    if (file.type !== "video/mp4") { setMessage("Selecione um arquivo MP4."); return; }
-    if (file.size > 100 * 1024 * 1024) { setMessage("O vídeo deve ter até 100 MB."); return; }
+    const config = deliveryTypes[kind];
+    const validMime = Array.isArray(config.mime) ? config.mime.includes(file.type) : file.type === config.mime;
+    if (!validMime) { setMessage(kind === "image" ? "Selecione uma imagem JPG, PNG ou WEBP." : "Formato de arquivo inválido."); return; }
+    if (file.size > config.max) { setMessage(kind === "video" ? "O vídeo deve ter até 100 MB." : "A imagem ou PDF deve ter até 20 MB."); return; }
     setBusyId(order.id); setMessage("");
-    const path = order.id + ".mp4";
+    const extension = kind === "image" ? (file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg") : config.extension;
+    const path = order.id + "." + extension;
     const { error: uploadError } = await supabase.storage.from("customer-deliveries").upload(path, file, {
-      upsert: true, contentType: "video/mp4",
+      upsert: true, contentType: file.type,
     });
     if (uploadError) {
-      setMessage("Não foi possível enviar o vídeo: " + uploadError.message);
+      setMessage("Não foi possível enviar o arquivo: " + uploadError.message);
       setBusyId("");
       return;
     }
     const { error: updateError } = await supabase.from("orders").update({
-      final_video_path: path,
+      [config.column]: path,
       fulfillment_status: "delivered",
       fulfilled_at: new Date().toISOString(),
     }).eq("id", order.id);
-    if (updateError) setMessage("O vídeo foi enviado, mas o pedido não foi atualizado. Peça ajuda ao suporte técnico.");
+    if (updateError) setMessage("O arquivo foi enviado, mas o pedido não foi atualizado. Peça ajuda ao suporte técnico.");
     else {
       setOrders((current) => current.map((item) => item.id === order.id
         ? { ...item, fulfillment_status: "delivered" } : item));
-      setMessage("Convite enviado para a área da cliente.");
+      setMessage(config.label + " enviado para a área da cliente.");
     }
     setBusyId("");
   }
@@ -95,7 +106,7 @@ function AdminPedidos() {
     <main className="min-h-screen bg-[#f8f6fc] px-4 py-8 text-[#302342] sm:px-7">
       <div className="mx-auto max-w-4xl">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <div><p className="text-xs font-semibold uppercase tracking-wider text-violet-500">Painel administrativo</p><h1 className="mt-1 font-display text-3xl font-semibold">Pedidos e entregas</h1><p className="mt-2 text-sm text-slate-500">Envie aqui o MP4 pronto. A cliente verá o botão de download na área Minha conta.</p></div>
+          <div><p className="text-xs font-semibold uppercase tracking-wider text-violet-500">Painel administrativo</p><h1 className="mt-1 font-display text-3xl font-semibold">Pedidos e entregas</h1><p className="mt-2 text-sm text-slate-500">Envie o convite pronto em vídeo, imagem ou PDF. A cliente verá os arquivos na área Minha conta.</p></div>
           <div className="flex gap-2"><a href="/admin" className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-semibold text-violet-700">Voltar ao painel</a><button onClick={() => void supabase.auth.signOut()} className="rounded-full border border-violet-200 bg-white p-2 text-violet-700" aria-label="Sair"><LogOut size={17}/></button></div>
         </header>
         {message && <p role="status" className="mt-5 rounded-xl bg-white p-4 text-sm text-violet-800 shadow-sm">{message}</p>}
@@ -105,13 +116,24 @@ function AdminPedidos() {
               <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div>
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">{order.payment_status === "approved" ? "Pago" : order.payment_status}</span>
             </div>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-              <p className="text-sm text-slate-600">{order.fulfillment_status === "delivered" ? "Convite entregue" : "Aguardando vídeo final"}</p>
-              {order.payment_status === "approved" ? <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white">
-                {busyId === order.id ? <FileVideo size={16}/> : <Upload size={16}/>}
-                {busyId === order.id ? "Enviando..." : "Enviar MP4 pronto"}
-                <input type="file" accept="video/mp4" className="hidden" disabled={Boolean(busyId)} onChange={(event) => { const file = event.target.files?.[0]; if (file) void deliver(order, file); event.currentTarget.value = ""; }}/>
-              </label> : <span className="text-xs text-slate-400">Disponível após pagamento aprovado</span>}
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+              {order.payment_status === "approved" ? (
+                <>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white opacity-100">
+                    <FileVideo size={16}/> Enviar MP4
+                    <input type="file" accept="video/mp4" className="hidden" disabled={Boolean(busyId)} onChange={(event) => { const file = event.target.files?.[0]; if (file) void deliver(order, "video", file); event.currentTarget.value = ""; }}/>
+                  </label>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-violet-100 px-4 py-2.5 text-sm font-semibold text-violet-800">
+                    <FileImage size={16}/> Enviar imagem
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={Boolean(busyId)} onChange={(event) => { const file = event.target.files?.[0]; if (file) void deliver(order, "image", file); event.currentTarget.value = ""; }}/>
+                  </label>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-violet-100 px-4 py-2.5 text-sm font-semibold text-violet-800">
+                    <FileText size={16}/> Enviar PDF
+                    <input type="file" accept="application/pdf" className="hidden" disabled={Boolean(busyId)} onChange={(event) => { const file = event.target.files?.[0]; if (file) void deliver(order, "pdf", file); event.currentTarget.value = ""; }}/>
+                  </label>
+                  {busyId === order.id && <span className="self-center text-xs text-slate-500">Enviando arquivo...</span>}
+                </>
+              ) : <span className="text-xs text-slate-400">Disponível após pagamento aprovado</span>}
             </div>
           </article>)}
           {!orders.length && <div className="rounded-2xl border border-dashed border-violet-200 bg-white p-12 text-center text-sm text-slate-500">Ainda não há pedidos.</div>}
