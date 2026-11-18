@@ -34,7 +34,7 @@ Deno.serve(async (request) => {
 
     const body = await request.json();
     const inviteSlug = typeof body.inviteSlug === "string" ? body.inviteSlug.trim() : "";
-    const email = typeof body.customerEmail === "string" ? body.customerEmail.trim().toLowerCase() : "";
+    const email = typeof body.customerEmail === "string" ? body.customerEmail.trim().toLowerCase() : "";\n    const whatsapp = typeof body.customerWhatsapp === "string" ? body.customerWhatsapp.trim() : "";
     const eventDetails = body.eventDetails && typeof body.eventDetails === "object" && !Array.isArray(body.eventDetails)
       ? body.eventDetails
       : {};
