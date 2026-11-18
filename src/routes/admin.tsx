@@ -151,7 +151,7 @@ function AdminPage() {
     if (result.error) { setMessage(result.error.message); return; }
     setDraft(emptyDraft()); setMessage("Convite salvo com sucesso.");
     const { data } = await supabase.from("invites")
-      .select("id,slug,name,category,description,price,image_url,video_url,is_active")
+      .select("id,slug,name,category,description,price,image_url,image_urls,video_url,is_active")
       .order("created_at", { ascending: false });
     setRows((data ?? []) as InviteRow[]);
   }
