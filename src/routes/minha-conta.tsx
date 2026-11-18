@@ -4,6 +4,7 @@ import { Download, Mail, PackageCheck, RefreshCw, Sparkles } from "lucide-react"
 import { SiteLayout } from "@/components/SiteLayout";
 import { supabase } from "@/lib/supabase";
 
+type CustomerAsset = { type: string; label: string; downloadUrl: string };
 type CustomerOrder = {
   id: string;
   inviteName: string;
@@ -11,7 +12,7 @@ type CustomerOrder = {
   paymentStatus: string;
   fulfillmentStatus: string;
   createdAt: string;
-  downloadUrl: string | null;
+  assets: CustomerAsset[];
 };
 
 export const Route = createFileRoute("/minha-conta")({
@@ -106,7 +107,9 @@ function MinhaConta() {
                       <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">{order.paymentStatus === "approved" ? "Pagamento aprovado" : "Aguardando pagamento"}</span>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{order.fulfillmentStatus === "delivered" ? "Seu convite está pronto!" : order.fulfillmentStatus === "in_progress" ? "Estamos preparando seu convite." : "Seu pedido está aguardando preparação."}</p>
-                    {order.downloadUrl && <a href={order.downloadUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"><Download size={16}/> Baixar convite MP4</a>}
+                    {order.assets?.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{order.assets.map((asset) => (
+                      <a key={asset.type} href={asset.downloadUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"><Download size={16}/>{asset.label}</a>
+                    ))}</div>}
                   </article>)}
                 </div>
               ) : <p className="mt-4 rounded-xl bg-secondary/60 p-4 text-sm text-muted-foreground">{message || "Nenhum pedido encontrado."}</p>}
