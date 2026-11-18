@@ -9,7 +9,7 @@ const executable = ts.transpile(source.replace(/^import .*\n/, ""), {
   module: ts.ModuleKind.None,
 });
 
-async function checkout(eventDetails?: unknown) {
+async function checkout(eventDetails?: unknown, whatsapp = "11 99999-9999") {
   let handler: ((request: Request) => Promise<Response>) | undefined;
   let inserted: Record<string, unknown> | undefined;
   const client = {
@@ -38,7 +38,7 @@ async function checkout(eventDetails?: unknown) {
   const response = await handler(new Request("https://example.com", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ inviteSlug: "test-invite", customerEmail: "checkout@example.com", eventDetails }),
+    body: JSON.stringify({ inviteSlug: "test-invite", customerEmail: "checkout@example.com", customerWhatsapp: whatsapp, eventDetails }),
   }));
   return { response, inserted };
 }
@@ -56,5 +56,12 @@ describe("create-checkout regression", () => {
     const { response, inserted } = await checkout(details);
     expect(response.status).toBe(200);
     expect(inserted?.['event_details']).toEqual({});
+  });
+
+  it("rejects a checkout without a WhatsApp number", async () => {
+    const { response, inserted } = await checkout({ celebrantName: "Samara" }, "");
+    expect(response.status).toBe(400);
+    expect(inserted).toBeUndefined();
+    expect(await response.json()).toMatchObject({ error: "Informe um convite válido, e-mail e WhatsApp com DDD." });
   });
 });
