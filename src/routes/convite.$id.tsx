@@ -37,6 +37,8 @@ function InviteProduct() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerWhatsapp, setCustomerWhatsapp] = useState("");
   const [selectedImage, setSelectedImage] = useState(invite.image);
+  const [customerWhatsapp, setCustomerWhatsapp] = useState("");
+  const [selectedImage, setSelectedImage] = useState(invite.image);
   const [eventName, setEventName] = useState("");
   const [eventAge, setEventAge] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -52,6 +54,10 @@ function InviteProduct() {
       setNotice("O pagamento ainda não está conectado ao banco de dados.");
       return;
     }
+    if (!/^\+?[0-9()\s-]{10,20}$/.test(customerWhatsapp.trim())) {
+      setNotice("Informe um WhatsApp válido com DDD.");
+      return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
       setNotice("Digite um e-mail válido para localizar seu pedido depois do pagamento.");
       return;
@@ -62,6 +68,7 @@ function InviteProduct() {
       body: {
         inviteSlug: invite.id,
         customerEmail: customerEmail.trim().toLowerCase(),
+        customerWhatsapp: customerWhatsapp.trim(),
         eventDetails: {
           celebrantName: eventName.trim(),
           age: eventAge.trim(),
@@ -104,8 +111,10 @@ function InviteProduct() {
               {invite.video && <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-primary">Vídeo</span>}
             </div>
             <div className="mx-auto max-w-[340px] overflow-hidden rounded-2xl bg-muted">
-              <InviteCanvas image={invite.image} video={invite.video} fields={invite.fields}/>
+              <InviteCanvas image={selectedImage} video={invite.video} fields={invite.fields}/>
             </div>
+            {invite.images && invite.images.length > 1 && <div className="mt-3 flex gap-2 overflow-x-auto pb-1">{invite.images.map((src, index) => <button key={src} type="button" onClick={() => setSelectedImage(src)} aria-label={`Ver foto ${index + 1}`} className={`h-20 w-16 shrink-0 overflow-hidden rounded-lg border-2 ${selectedImage === src ? "border-primary" : "border-transparent"}`}><img src={src} alt={`${invite.name} - foto ${index + 1}`} className="h-full w-full object-cover"/></button>)}</div>}
+            {invite.video && <video src={invite.video} controls playsInline preload="metadata" poster={invite.image} className="mt-4 w-full rounded-xl bg-black" />}
             <p className="mt-3 text-center text-xs text-muted-foreground">A arte final será liberada após a confirmação do pagamento.</p>
           </section>
 
@@ -142,7 +151,10 @@ function InviteProduct() {
                 <label className="block text-sm font-semibold">Observações ou mensagem extra
                   <textarea value={eventMessage} onChange={(event) => setEventMessage(event.target.value)} maxLength={500} rows={3} placeholder="Informações adicionais para colocar no convite..." className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
                 </label>
-                <label className="block text-sm font-semibold">WhatsApp com DDD *\n                  <input required type="tel" inputMode="tel" autoComplete="tel" value={customerWhatsapp} onChange={(event) => setCustomerWhatsapp(event.target.value)} maxLength={20} placeholder="(11) 99999-9999" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Obrigatório para contato sobre seu pedido.</span>\n                </label>\n                <label className="block text-sm font-semibold">Seu e-mail *
+                <label className="block text-sm font-semibold">WhatsApp com DDD *\n                  <input required type="tel" inputMode="tel" autoComplete="tel" value={customerWhatsapp} onChange={(event) => setCustomerWhatsapp(event.target.value)} maxLength={20} placeholder="(11) 99999-9999" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Obrigatório para contato sobre seu pedido.</span>\n                </label>\n                <label className="block text-sm font-semibold">WhatsApp com DDD *
+                  <input required type="tel" inputMode="tel" autoComplete="tel" value={customerWhatsapp} onChange={(event) => setCustomerWhatsapp(event.target.value)} maxLength={20} placeholder="(11) 99999-9999" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Obrigatório para contato sobre seu pedido.</span>
+                </label>
+                <label className="block text-sm font-semibold">Seu e-mail *
                   <input required type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
                 </label>
               </div>
