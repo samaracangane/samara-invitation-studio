@@ -27,7 +27,7 @@ export type TextField = {
 export type Invite = {
   id: string;
   name: string;
-  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
   description: string;
   price: string;
   image: string;
@@ -35,7 +35,7 @@ export type Invite = {
   fields: TextField[];
 };
 
-export const CATEGORIES = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos"] as const;
+export const CATEGORIES = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos","Patrulha Canina"] as const;
 
 export const invites: Invite[] = [
   {
