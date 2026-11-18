@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 type OrderRow = {
   id: string;
   invite_name: string;
-  customer_email: string | null;
+  customer_email: string | null;\n  customer_whatsapp?: string | null;
   payment_status: string;
   fulfillment_status: string;
   created_at: string;
@@ -60,7 +60,7 @@ function AdminPedidos() {
       if (!admin) { setAuthorized(false); setLoading(false); setMessage("Esta conta não tem permissão administrativa."); return; }
       setAuthorized(true);
       const { data, error } = await supabase.from("orders")
-        .select("id,invite_name,customer_email,payment_status,fulfillment_status,created_at,event_details")
+        .select("id,invite_name,customer_email,customer_whatsapp,payment_status,fulfillment_status,created_at,event_details")
         .order("created_at", { ascending: false });
       if (!alive) return;
       if (error) setMessage("Não foi possível carregar os pedidos. Confira se a migração da área do cliente foi aplicada.");
@@ -122,7 +122,7 @@ function AdminPedidos() {
         <section className="mt-6 space-y-3">
           {orders.map((order) => <article key={order.id} className="rounded-2xl border border-violet-100 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div>
+              <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-sm font-semibold text-violet-700">WhatsApp: {order.customer_whatsapp || "Não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div>
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">{order.payment_status === "approved" ? "Pago" : order.payment_status}</span>
             </div>
             {order.event_details && <div className="mt-4 rounded-xl bg-violet-50/70 p-4">
