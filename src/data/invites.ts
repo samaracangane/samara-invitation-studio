@@ -105,7 +105,7 @@ export const invites: Invite[] = [
   {
     id: "safari-baby",
     name: "Safari Baby",
-    category: "Infantil",
+    category: "Safari",
     description: "Bichinhos fofos da selva e balões coloridos.",
     price: "R$ 25,00",
     image: safari,
