@@ -3,14 +3,22 @@ alter table public.orders
   add column if not exists fulfillment_status text not null default 'waiting'
     check (fulfillment_status in ('waiting','in_progress','delivered')),
   add column if not exists final_video_path text,
+  add column if not exists final_image_path text,
+  add column if not exists final_pdf_path text,
   add column if not exists fulfilled_at timestamptz;
 
 create index if not exists orders_customer_email_idx
   on public.orders (lower(customer_email), created_at desc);
 
--- Private bucket for final personalized videos.
+-- Private bucket for personalized MP4, image, and PDF deliveries.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('customer-deliveries', 'customer-deliveries', false, 104857600, array['video/mp4'])
+values (
+  'customer-deliveries',
+  'customer-deliveries',
+  false,
+  104857600,
+  array['video/mp4','image/jpeg','image/png','image/webp','application/pdf']
+)
 on conflict (id) do update set
   public = false,
   file_size_limit = excluded.file_size_limit,
