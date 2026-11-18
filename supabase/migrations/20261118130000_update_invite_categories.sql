@@ -1,4 +1,14 @@
--- Allow the 20 theme categories shown in the public catalog and admin form.
+-- Replace the old store categories while preserving existing invite records.
+update public.invites
+set category = case category
+  when 'Infantil' then 'Desenhos Animados'
+  when 'Casamento' then 'Jardim Encantado'
+  when '15 Anos' then 'Princesas'
+  when 'Outros' then 'Desenhos Animados'
+  else category
+end
+where category in ('Infantil', 'Casamento', '15 Anos', 'Outros');
+
 alter table public.invites
   drop constraint if exists invites_category_check;
 
