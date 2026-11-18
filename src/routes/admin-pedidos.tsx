@@ -10,6 +10,15 @@ type OrderRow = {
   payment_status: string;
   fulfillment_status: string;
   created_at: string;
+  event_details: {
+    celebrantName?: string;
+    age?: string;
+    eventDate?: string;
+    eventTime?: string;
+    location?: string;
+    address?: string;
+    message?: string;
+  } | null;
 };
 
 const deliveryTypes = {
@@ -51,7 +60,7 @@ function AdminPedidos() {
       if (!admin) { setAuthorized(false); setLoading(false); setMessage("Esta conta não tem permissão administrativa."); return; }
       setAuthorized(true);
       const { data, error } = await supabase.from("orders")
-        .select("id,invite_name,customer_email,payment_status,fulfillment_status,created_at")
+        .select("id,invite_name,customer_email,payment_status,fulfillment_status,created_at,event_details")
         .order("created_at", { ascending: false });
       if (!alive) return;
       if (error) setMessage("Não foi possível carregar os pedidos. Confira se a migração da área do cliente foi aplicada.");
@@ -116,6 +125,17 @@ function AdminPedidos() {
               <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div>
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">{order.payment_status === "approved" ? "Pago" : order.payment_status}</span>
             </div>
+            {order.event_details && <div className="mt-4 rounded-xl bg-violet-50/70 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700">Dados informados para a festa</h3>
+              <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+                <div><dt className="text-xs text-slate-500">Aniversariante</dt><dd className="font-semibold">{order.event_details.celebrantName || "—"}{order.event_details.age ? " · " + order.event_details.age : ""}</dd></div>
+                <div><dt className="text-xs text-slate-500">Data</dt><dd className="font-semibold">{order.event_details.eventDate ? new Date(order.event_details.eventDate + "T00:00:00").toLocaleDateString("pt-BR") : "—"}</dd></div>
+                <div><dt className="text-xs text-slate-500">Horário</dt><dd className="font-semibold">{order.event_details.eventTime || "—"}</dd></div>
+                <div><dt className="text-xs text-slate-500">Local</dt><dd className="font-semibold">{order.event_details.location || "—"}</dd></div>
+                {order.event_details.address && <div className="sm:col-span-2"><dt className="text-xs text-slate-500">Endereço</dt><dd>{order.event_details.address}</dd></div>}
+                {order.event_details.message && <div className="sm:col-span-2"><dt className="text-xs text-slate-500">Observações</dt><dd className="whitespace-pre-wrap">{order.event_details.message}</dd></div>}
+              </dl>
+            </div>}
             <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
               {order.payment_status === "approved" ? (
                 <>
