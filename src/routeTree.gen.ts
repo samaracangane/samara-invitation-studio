@@ -18,6 +18,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
 import { Route as RetornoRouteImport } from './routes/retorno'
+import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const RetornoRoute = RetornoRouteImport.update({
   path: '/retorno',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MinhaContaRoute = MinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
@@ -101,10 +107,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,6 +123,7 @@ export interface RootRouteChildren {
   EditorRoute: typeof EditorRoute
   PagamentosRoute: typeof PagamentosRoute
   RetornoRoute: typeof RetornoRoute
+  MinhaContaRoute: typeof MinhaContaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetornoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/minha-conta': {
+      id: '/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof MinhaContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -197,6 +211,7 @@ const rootRouteChildren: RootRouteChildren = {
   EditorRoute: EditorRoute,
   PagamentosRoute: PagamentosRoute,
   RetornoRoute: RetornoRoute,
+  MinhaContaRoute: MinhaContaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
