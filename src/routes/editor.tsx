@@ -4,7 +4,7 @@ import {
   ArrowLeft, ArrowDown, ArrowUp, Download, Eye, EyeOff, Lock, Plus,
   Redo2, RotateCcw, Sparkles, Trash2, Unlock, Undo2, WandSparkles, ImagePlus,
 } from "lucide-react";
-import { invites, type Invite } from "@/data/invites";
+import { invites, mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 type Layer = {
@@ -56,7 +56,8 @@ export const Route = createFileRoute("/editor")({
 
 function MagicEditor() {
   const [inviteId, setInviteId] = useState("15-anos-coroa");
-  const activeInvite = invites.find((item) => item.id === inviteId) ?? invites[0];
+  const [remoteInvite, setRemoteInvite] = useState<Invite | null>(null);
+  const activeInvite = (remoteInvite?.id === inviteId ? remoteInvite : invites.find((item) => item.id === inviteId)) ?? invites[0];
   const [layers, setLayers] = useState<Layer[]>(sampleLayers);
   const [selected, setSelected] = useState("name");
   const [history, setHistory] = useState<Layer[][]>([]);
@@ -76,7 +77,17 @@ function MagicEditor() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const requestedInvite = params.get("invite");
-    if (requestedInvite && invites.some((item) => item.id === requestedInvite)) setInviteId(requestedInvite);
+    if (requestedInvite) {
+      setInviteId(requestedInvite);
+      const localInvite = invites.find((item) => item.id === requestedInvite);
+      if (localInvite) setRemoteInvite(null);
+      else if (supabase) {
+        void supabase.from("invites").select("slug,name,category,description,price,image_url,video_url,fields").eq("slug", requestedInvite).eq("active", true).maybeSingle().then(({ data, error }) => {
+          if (!error && data) setRemoteInvite(mapSupabaseInvite(data));
+          else setNotice("Could not load this catalog invitation. Return to the store and open it again.");
+        });
+      }
+    }
     const requestedOrder = params.get("order");
     if (!requestedOrder) return;
     const raw = localStorage.getItem("samara-order:" + requestedOrder);
@@ -90,7 +101,7 @@ function MagicEditor() {
         if (error || !data) { setNotice(data?.error || "Não foi possível validar seu pedido."); return; }
         if (data.status === "approved") {
           setPaidAccess(true);
-          if (invites.some((item) => item.id === data.inviteId)) setInviteId(data.inviteId);
+          if (typeof data.inviteId === "string") setInviteId(data.inviteId);
           setNotice("Pagamento confirmado. Edição, salvamento e exportação liberados.");
         } else {
           setNotice("O pagamento ainda não foi confirmado. O editor permanece em modo de prévia.");
@@ -302,16 +313,19 @@ function MagicEditor() {
           <div className="mb-3 flex w-full max-w-[430px] items-center justify-between gap-3 text-xs text-slate-500">
             <span>Pré-visualização do convite</span>
             <select value={inviteId} disabled={paidAccess} onChange={(event) => setInviteId(event.target.value)} className="max-w-[190px] rounded-lg border bg-white px-2 py-1.5 text-xs disabled:opacity-60">
+              {remoteInvite && !invites.some((item) => item.id === remoteInvite.id) && <option value={remoteInvite.id}>{remoteInvite.name}</option>}
               {invites.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </div>
           <div ref={stageRef} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp} className="relative aspect-[4/5] w-full max-w-[430px] touch-none overflow-hidden rounded-xl bg-white shadow-2xl" style={{ backgroundImage: 'url("' + activeInvite.image + '")', backgroundSize: "cover", backgroundPosition: "center" }}>
+            {activeInvite.video && <video key={activeInvite.video} src={activeInvite.video} poster={activeInvite.image} autoPlay muted loop playsInline className="pointer-events-none absolute inset-0 h-full w-full object-cover"/>}
             {layers.filter((layer) => layer.visible).map((layer) => (
               <button key={layer.id} type="button" onPointerDown={(event) => { setSelected(layer.id); if (!layer.locked) { dragStartRef.current = layers.map((item) => ({ ...item })); setDragging(layer.id); event.currentTarget.setPointerCapture(event.pointerId); } }} onClick={() => setSelected(layer.id)} className={"absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded px-1 outline-none " + (selected === layer.id ? "ring-2 ring-violet-400 ring-offset-2" : "hover:ring-1 hover:ring-white")} style={{ left: layer.x + "%", top: layer.y + "%", color: layer.color, fontFamily: layer.font, fontSize: "clamp(10px, " + (layer.size * 0.45) + "vw, 40px)", fontWeight: 600, textShadow: "0 1px 5px #0008", width: layer.kind === "image" ? (layer.size * 2) + "%" : undefined, height: layer.kind === "image" ? (layer.size * 2) + "%" : undefined }}>{layer.kind === "image" && layer.src ? <img src={layer.src} alt={layer.name} draggable={false} className="h-full w-full object-contain"/> : layer.text}</button>
             ))}
             {!paidAccess && <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-4 py-1.5 text-[10px] font-bold tracking-[.2em] text-white">PRÉVIA</div>}
           </div>
           <p className="mt-3 text-center text-[11px] text-slate-500">{saveState}</p>
+          {activeInvite.video && <p className="mt-1 max-w-[430px] text-center text-[11px] text-amber-700">Original MP4 preview only. Personalized video export is not implemented yet; current downloads remain SVG/PNG.</p>}
         </section>
 
         <aside className="order-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
