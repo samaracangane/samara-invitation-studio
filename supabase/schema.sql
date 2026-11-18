@@ -38,11 +38,13 @@ create policy "Admins manage invites" on public.invites
 
 -- Usuários não podem se promover a administrador. A inclusão inicial deve ser feita
 -- manualmente pelo proprietário no SQL Editor, após criar a conta em Authentication.
+
 drop policy if exists "Admins can read admin list" on public.admin_users;
+drop policy if exists "Users can read their own admin record" on public.admin_users;
+
 create policy "Users can read their own admin record" on public.admin_users
   for select to authenticated
   using (user_id = auth.uid());
-
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('invite-media', 'invite-media', true, 52428800, array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm'])
 on conflict (id) do update set public = excluded.public,
