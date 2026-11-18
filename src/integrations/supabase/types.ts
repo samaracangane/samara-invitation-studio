@@ -29,6 +29,11 @@ export type Database = {
         }
         Relationships: []
       }
+lovable-sync
+      invites: {
+        Row: {
+          category: string
+
       invite_designs: {
         Row: {
           design_json: Json
@@ -65,6 +70,7 @@ export type Database = {
         Row: {
           category: string
           checkout_url: string | null
+main
           created_at: string
           description: string
           fields: Json
@@ -79,7 +85,10 @@ export type Database = {
         }
         Insert: {
           category: string
+ lovable-sync
+
           checkout_url?: string | null
+main
           created_at?: string
           description?: string
           fields?: Json
@@ -94,7 +103,10 @@ export type Database = {
         }
         Update: {
           category?: string
+lovable-sync
+
           checkout_url?: string | null
+main
           created_at?: string
           description?: string
           fields?: Json
@@ -109,6 +121,8 @@ export type Database = {
         }
         Relationships: []
       }
+lovable-sync
+
       orders: {
         Row: {
           access_token_hash: string | null
@@ -266,6 +280,7 @@ export type Database = {
           },
         ]
       }
+ main
     }
     Views: {
       [_ in never]: never
