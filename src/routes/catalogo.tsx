@@ -18,14 +18,7 @@ export const Route = createFileRoute("/catalogo")({
   component: Catalogo,
 });
 
-const CATEGORY_ART: Record<string, string> = {
-  "Mickey": "🐭", "Minnie": "🎀", "Bluey": "🐶", "Alice": "🐇",
-  "Dos Rosa": "💗", "Guerreiras K-Pop": "🎤", "Desenhos Animados": "🎨",
-  "Princesas": "👑", "Super Herói": "🦸", "Fundo do Mar": "🧜‍♀️",
-  "Dinossauro": "🦕", "Toy Story": "🚀", "Barbie": "💖", "Hello Kitty": "🎀",
-  "Fazendinha": "🐮", "Circo": "🎪", "Safari": "🦁",
-  "Jardim Encantado": "🦋", "365 Sorrisos": "🌈", "Patrulha Canina": "🐾",
-};
+const CATEGORY_ART: Record<string, string> = {"Mickey":"🐭","Minnie":"🎀","Bluey":"🐶","Alice":"🐇","Dos Rosa":"💗","Guerreiras K-Pop":"🎤","Desenhos Animados":"🎨","Princesas":"👑","Super Herói":"🦸","Fundo do Mar":"🧜‍♀️","Dinossauro":"🦕","Toy Story":"🚀","Barbie":"💖","Hello Kitty":"🎀","Fazendinha":"🐮","Circo":"🎪","Safari":"🦁","Jardim Encantado":"🦋","365 Sorrisos":"🌈","Patrulha Canina":"🐾"};
 
 function Catalogo() {
   const [cat, setCat] = useState<string>("Todos");
