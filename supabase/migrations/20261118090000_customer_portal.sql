@@ -54,3 +54,11 @@ create policy "Admins delete customer deliveries" on storage.objects
     bucket_id = 'customer-deliveries'
     and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
   );
+
+drop policy if exists "Admins read customer deliveries" on storage.objects;
+create policy "Admins read customer deliveries" on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'customer-deliveries'
+    and exists (select 1 from public.admin_users a where a.user_id = auth.uid())
+  );
