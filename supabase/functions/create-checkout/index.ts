@@ -73,6 +73,7 @@ Deno.serve(async (request) => {
         amount_cents: amountCents,
         currency: "BRL",
         customer_email: email,
+        event_details: eventDetails,
         payment_provider: "wiapy",
         provider_checkout_id: offer.checkout_id,
         checkout_url: offer.checkout_url,
