@@ -1,26 +1,23 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Sparkles, WandSparkles, CreditCard } from "lucide-react";
+import { ArrowLeft, Sparkles, CreditCard } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCanvas } from "@/components/InviteCanvas";
-import { getInvite, mapSupabaseInvite, waLink } from "@/data/invites";
+import { mapSupabaseInvite, waLink } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/convite/$id")({
   loader: async ({ params }) => {
-    if (supabase) {
-      const { data } = await supabase
-        .from("invites")
-        .select("slug,name,category,description,price,image_url,video_url,fields")
-        .eq("slug", params.id)
-        .eq("is_active", true)
-        .maybeSingle();
-      if (data) return { invite: mapSupabaseInvite(data) };
-    }
-    const invite = getInvite(params.id);
-    if (!invite) throw notFound();
-    return { invite };
+    if (!supabase) throw notFound();
+    const { data } = await supabase
+      .from("invites")
+      .select("slug,name,category,description,price,image_url,video_url,fields")
+      .eq("slug", params.id)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (!data) throw notFound();
+    return { invite: mapSupabaseInvite(data) };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -114,7 +111,7 @@ function InviteProduct() {
             <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-sm sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Investimento</p>
               <p className="mt-2 font-display text-3xl font-semibold">{invite.price}</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Personalize os dados da comemoração e finalize seu convite no editor online.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Personalize os dados da comemoração e receba a arte final preparada por nossa equipe após a confirmação do pagamento.</p>
               <div className="mt-6 space-y-4">
                 <div>
                   <h2 className="text-base font-semibold">Dados da festa</h2>
@@ -151,8 +148,6 @@ function InviteProduct() {
                 <CreditCard className="h-4 w-4"/>{busy ? "Preparando pagamento..." : "Comprar e personalizar"}
               </button>
               {notice && <p role="status" className="mt-3 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900">{notice}</p>}
-              <a href={"/editor?invite=" + encodeURIComponent(invite.id)} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 px-5 py-3 text-sm font-semibold text-primary transition hover:bg-secondary"><WandSparkles className="h-4 w-4"/> Experimentar editor (prévia)</a>
-              <p className="mt-3 text-xs leading-5 text-muted-foreground">A prévia do editor permite testar as ferramentas. A exportação e o salvamento na conta serão liberados somente após a confirmação do pedido.</p>
             </div>
             <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-sm sm:p-7">
               <h2 className="font-display text-xl font-semibold">Prefere tirar dúvidas?</h2>
