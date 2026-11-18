@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCard } from "@/components/InviteCard";
-import { CATEGORIES, invites } from "@/data/invites";
+import { CATEGORIES, invites, mapSupabaseInvite, type Invite } from "@/data/invites";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
@@ -20,14 +21,38 @@ export const Route = createFileRoute("/catalogo")({
 function Catalogo() {
   const [cat, setCat] = useState<string>("Todos");
   const [search, setSearch] = useState("");
+  const [catalogInvites, setCatalogInvites] = useState<Invite[]>(invites);
+
+  useEffect(() => {
+    let alive = true;
+    async function loadInvites() {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from("invites")
+        .select("slug,name,category,description,price,image_url,video_url,fields")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      if (!alive || error || !data) return;
+
+      const dynamicInvites = data.map((row) => mapSupabaseInvite(row));
+      const dynamicIds = new Set(dynamicInvites.map((invite) => invite.id));
+      setCatalogInvites([
+        ...dynamicInvites,
+        ...invites.filter((invite) => !dynamicIds.has(invite.id)),
+      ]);
+    }
+    void loadInvites();
+    return () => { alive = false; };
+  }, []);
+
   const list = useMemo(() => {
     const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
-    return invites.filter((invite) => {
+    return catalogInvites.filter((invite) => {
       const matchesCategory = cat === "Todos" || (cat === "Animados" ? Boolean(invite.video) : invite.category === cat);
       const matchesSearch = !normalizedSearch || invite.name.toLocaleLowerCase("pt-BR").includes(normalizedSearch) || invite.description.toLocaleLowerCase("pt-BR").includes(normalizedSearch) || invite.category.toLocaleLowerCase("pt-BR").includes(normalizedSearch);
       return matchesCategory && matchesSearch;
     });
-  }, [cat, search]);
+  }, [catalogInvites, cat, search]);
 
   return (
     <SiteLayout>
