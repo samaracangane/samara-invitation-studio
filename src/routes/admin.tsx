@@ -10,16 +10,17 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type InviteRow = {
   id: string; slug: string; name: string;
-  category: "Infantil" | "Casamento" | "15 Anos" | "Mickey" | "Minnie" | "Bluey" | "Barbie" | "Safari" | "Princesas" | "Outros";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos";
   description: string; price: number; image_url: string | null;
   video_url: string | null; is_active: boolean;
 };
 type Draft = {
   id?: string; slug: string; name: string;
-  category: "Infantil" | "Casamento" | "15 Anos" | "Mickey" | "Minnie" | "Bluey" | "Barbie" | "Safari" | "Princesas" | "Outros";
+  category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos";
   description: string; price: string; image_url: string;
   video_url: string; is_active: boolean;
 };
+const CATEGORY_OPTIONS = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos"] as const;
 const emptyDraft = (): Draft => ({
   slug: "", name: "", category: "Infantil", description: "",
   price: "25", image_url: "", video_url: "", is_active: true,
@@ -81,12 +82,10 @@ function AdminPage() {
   }, [session]);
 
   const activeCount = useMemo(() => rows.filter((item) => item.is_active).length, [rows]);
-  const categoryCounts = useMemo(() => [
-    { name: "Infantil", count: rows.filter((item) => item.category === "Infantil").length, color: "bg-violet-500" },
-    { name: "Casamento", count: rows.filter((item) => item.category === "Casamento").length, color: "bg-pink-500" },
-    { name: "15 Anos", count: rows.filter((item) => item.category === "15 Anos").length, color: "bg-amber-500" },
-    ...["Mickey", "Minnie", "Bluey", "Barbie", "Safari", "Princesas", "Outros"].map((name) => ({ name, count: rows.filter((item) => item.category === name).length, color: "bg-fuchsia-500" })),
-  ], [rows]);
+  const categoryCounts = useMemo(() => CATEGORY_OPTIONS.map((name, index) => ({
+    name, count: rows.filter((item) => item.category === name).length,
+    color: ["bg-violet-500", "bg-pink-500", "bg-amber-500", "bg-fuchsia-500"][index % 4],
+  })), [rows]);
   const filteredRows = useMemo(() => rows.filter((row) =>
     (row.name + " " + row.category).toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))
   ), [rows, query]);
@@ -243,7 +242,7 @@ function AdminPage() {
               <label className="block text-sm font-medium text-slate-700">Nome do convite<input required value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})} placeholder="Ex.: Jardim Encantado" className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-50"/></label>
               <label className="block text-sm font-medium text-slate-700">Identificador (slug)<input value={draft.slug} onChange={e=>setDraft({...draft,slug:e.target.value})} placeholder="Gerado automaticamente" className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-50"/></label>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-slate-700">Categoria<select value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value as Draft["category"]})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"><option>Infantil</option><option>Casamento</option><option>15 Anos</option><option>Mickey</option><option>Minnie</option><option>Bluey</option><option>Barbie</option><option>Safari</option><option>Princesas</option><option>Outros</option></select></label>
+                <label className="block text-sm font-medium text-slate-700">Categoria<select value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value as Draft["category"]})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3">{CATEGORY_OPTIONS.map((category) => <option key={category}>{category}</option>)}</select></label>
                 <label className="block text-sm font-medium text-slate-700">Preço (R$)<input required type="number" min="0" step="0.01" value={draft.price} onChange={e=>setDraft({...draft,price:e.target.value})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"/></label>
               </div>
               <label className="block text-sm font-medium text-slate-700">Descrição<textarea value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} rows={3} placeholder="Conte um pouco sobre este modelo..." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400"/></label>
