@@ -31,6 +31,7 @@ export type Invite = {
   description: string;
   price: string;
   image: string;
+  images?: string[];
   video?: string | undefined;
   fields: TextField[];
 };
@@ -133,6 +134,7 @@ export type SupabaseInviteRow = {
   description: string | null;
   price: number | string;
   image_url: string | null;
+  image_urls?: string[] | null;
   video_url: string | null;
   fields: unknown;
 };
@@ -144,7 +146,8 @@ export function mapSupabaseInvite(row: SupabaseInviteRow): Invite {
     category: row.category,
     description: row.description ?? "",
     price: Number(row.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-    image: row.image_url || invites[0]!.image,
+    image: row.image_url || row.image_urls?.[0] || invites[0]!.image,
+    images: row.image_urls?.length ? row.image_urls : (row.image_url ? [row.image_url] : []),
     video: row.video_url || undefined,
     fields: Array.isArray(row.fields) ? row.fields as TextField[] : [],
   };
