@@ -31,7 +31,7 @@ function Catalogo() {
       if (!supabase) return;
       const { data, error } = await supabase
         .from("invites")
-        .select("slug,name,category,description,price,image_url,video_url,fields")
+        .select("slug,name,category,description,price,image_url,image_urls,video_url,fields")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
       if (!alive) return;
