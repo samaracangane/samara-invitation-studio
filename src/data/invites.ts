@@ -41,7 +41,7 @@ export const invites: Invite[] = [
   {
     id: "micaela-kpop-demon-hunters",
     name: "Convite Micaela — K-Pop Demon Hunters",
-    category: "Infantil",
+    category: "Guerreiras K-Pop",
     description: "Convite digital temático K-Pop Demon Hunters, com arte em tons neon de rosa e roxo. Personalizado com nome, idade, data, horário e local da festa.",
     price: "Consulte o valor",
     image: micaelaKpop,
@@ -50,7 +50,7 @@ export const invites: Invite[] = [
   {
     id: "idol-pop-animado",
     name: "Idol Pop Estrelinha (Animado)",
-    category: "Infantil",
+    category: "Desenhos Animados",
     description: "Convite animado com pétalas e brilhos em movimento. Ideal para festas temáticas pop.",
     price: "R$ 45,00",
     image: idol,
@@ -66,7 +66,7 @@ export const invites: Invite[] = [
   {
     id: "idol-pop",
     name: "Idol Pop Estrelinha",
-    category: "Infantil",
+    category: "Safari",
     description: "Versão em imagem do convite Idol Pop, pronta para WhatsApp.",
     price: "R$ 25,00",
     image: idol,
@@ -75,7 +75,7 @@ export const invites: Invite[] = [
   {
     id: "casamento-rosas",
     name: "Rosas & Eucalipto",
-    category: "Casamento",
+    category: "Jardim Encantado",
     description: "Aquarela delicada com moldura dourada. Elegância atemporal.",
     price: "R$ 35,00",
     image: casamento,
@@ -91,7 +91,7 @@ export const invites: Invite[] = [
   {
     id: "15-anos-coroa",
     name: "Coroa Dourada",
-    category: "15 Anos",
+    category: "Princesas",
     description: "Azul noite com coroa e brilhos dourados para uma debutante inesquecível.",
     price: "R$ 35,00",
     image: quinze,
