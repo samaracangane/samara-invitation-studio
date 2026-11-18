@@ -43,6 +43,8 @@ function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [categoryPhoto, setCategoryPhoto] = useState<string>(CATEGORY_OPTIONS[0]);
+  const [categoryPhotoUrls, setCategoryPhotoUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!supabase) { setChecking(false); return; }
@@ -67,6 +69,8 @@ function AdminPage() {
         setMessage("Este e-mail ainda não foi liberado como administrador. Verifique a configuração no Supabase.");
       } else {
         setAuthorized(true); setMessage("");
+        const { data: categoryMedia } = await supabase.from("category_media").select("category,image_url");
+        if (categoryMedia) setCategoryPhotoUrls(Object.fromEntries(categoryMedia.map((item) => [item.category, item.image_url])));
         const { data: invites, error: listError } = await supabase.from("invites")
           .select("id,slug,name,category,description,price,image_url,video_url,is_active")
           .order("created_at", { ascending: false });
@@ -110,6 +114,19 @@ function AdminPage() {
     const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
     setDraft((current) => ({ ...current, [kind === "image" ? "image_url" : "video_url"]: data.publicUrl }));
     setMessage(kind === "image" ? "Imagem enviada com sucesso." : "Vídeo enviado com sucesso.");
+  }
+
+  async function uploadCategoryPhoto(file: File) {
+    if (!supabase || !session?.user) return;
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
+    const path = `${session.user.id}/categorias/${Date.now()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage.from("invite-media").upload(path, file, { upsert: true });
+    if (uploadError) { setMessage(uploadError.message); return; }
+    const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
+    const { error } = await supabase.from("category_media").upsert({ category: categoryPhoto, image_url: data.publicUrl, updated_at: new Date().toISOString() });
+    if (error) { setMessage(error.message); return; }
+    setCategoryPhotoUrls((current) => ({ ...current, [categoryPhoto]: data.publicUrl }));
+    setMessage(`Foto da categoria ${categoryPhoto} salva com sucesso.`);
   }
 
   async function saveInvite(event: FormEvent) {
@@ -224,6 +241,17 @@ function AdminPage() {
             </div>
             {rows.length===0 && <p className="mt-5 rounded-xl bg-violet-50 p-3 text-xs text-violet-700">Assim que você cadastrar convites, os dados aparecerão aqui.</p>}
           </section>
+          <section className="mt-5 rounded-2xl border border-violet-100/80 bg-white p-5 shadow-[0_8px_30px_-22px_rgba(61,37,91,.25)] sm:p-6">
+            <div><h2 className="text-lg font-semibold">Fotos das categorias</h2><p className="mt-1 text-xs text-slate-500">Escolha uma categoria e envie a imagem que aparecerá na página inicial.</p></div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr]">
+              <label className="block text-sm font-medium text-slate-700">Categoria
+                <select value={categoryPhoto} onChange={e=>setCategoryPhoto(e.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3">{CATEGORY_OPTIONS.map(category=><option key={category}>{category}</option>)}</select>
+              </label>
+              <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-3 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-violet-600"/> Enviar foto da categoria</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>e.target.files?.[0] && void uploadCategoryPhoto(e.target.files[0])} className="mt-2 block w-full text-xs"/></label>
+            </div>
+            {categoryPhotoUrls[categoryPhoto] && <img src={categoryPhotoUrls[categoryPhoto]} alt={categoryPhoto} className="mt-4 h-28 w-28 rounded-2xl border object-cover"/>}
+          </section>
+
           <section className="rounded-2xl border border-violet-100/80 bg-white p-5 shadow-[0_8px_30px_-22px_rgba(61,37,91,.25)] sm:p-6">
             <div className="flex items-center gap-2"><Sparkles className="text-amber-500"/><h2 className="text-lg font-semibold">Ações rápidas</h2></div>
             <div className="mt-5 grid grid-cols-2 gap-3">
