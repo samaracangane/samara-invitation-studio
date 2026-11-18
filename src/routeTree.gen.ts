@@ -87,6 +87,8 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
@@ -98,6 +100,8 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRoutesById {
   '/admin': typeof AdminRoute
@@ -110,13 +114,15 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
