@@ -11,19 +11,19 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 type InviteRow = {
   id: string; slug: string; name: string;
   category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
-  description: string; price: number; image_url: string | null;
+  description: string; price: number; image_url: string | null; image_urls?: string[];
   video_url: string | null; is_active: boolean;
 };
 type Draft = {
   id?: string; slug: string; name: string;
   category: "Mickey" | "Minnie" | "Bluey" | "Alice" | "Dos Rosa" | "Guerreiras K-Pop" | "Desenhos Animados" | "Princesas" | "Super Herói" | "Fundo do Mar" | "Dinossauro" | "Toy Story" | "Barbie" | "Hello Kitty" | "Fazendinha" | "Circo" | "Safari" | "Jardim Encantado" | "365 Sorrisos" | "Patrulha Canina";
-  description: string; price: string; image_url: string;
+  description: string; price: string; image_url: string; image_urls: string[];
   video_url: string; is_active: boolean;
 };
 const CATEGORY_OPTIONS = ["Mickey","Minnie","Bluey","Alice","Dos Rosa","Guerreiras K-Pop","Desenhos Animados","Princesas","Super Herói","Fundo do Mar","Dinossauro","Toy Story","Barbie","Hello Kitty","Fazendinha","Circo","Safari","Jardim Encantado","365 Sorrisos","Patrulha Canina"] as const;
 const emptyDraft = (): Draft => ({
   slug: "", name: "", category: "Mickey", description: "",
-  price: "25", image_url: "", video_url: "", is_active: true,
+  price: "25", image_url: "", image_urls: [], video_url: "", is_active: true,
 });
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -72,7 +72,7 @@ function AdminPage() {
         const { data: categoryMedia } = await supabase.from("category_media").select("category,image_url");
         if (categoryMedia) setCategoryPhotoUrls(Object.fromEntries(categoryMedia.map((item) => [item.category, item.image_url])));
         const { data: invites, error: listError } = await supabase.from("invites")
-          .select("id,slug,name,category,description,price,image_url,video_url,is_active")
+          .select("id,slug,name,category,description,price,image_url,image_urls,video_url,is_active")
           .order("created_at", { ascending: false });
         if (alive) {
           if (listError) setMessage(listError.message);
@@ -112,8 +112,13 @@ function AdminPage() {
     const { error } = await supabase.storage.from("invite-media").upload(path, file, { upsert: true });
     if (error) { setMessage(error.message); return; }
     const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
-    setDraft((current) => ({ ...current, [kind === "image" ? "image_url" : "video_url"]: data.publicUrl }));
-    setMessage(kind === "image" ? "Imagem enviada com sucesso." : "Vídeo enviado com sucesso.");
+    if (kind === "image") {
+      setDraft((current) => ({ ...current, image_url: current.image_url || data.publicUrl, image_urls: [...(current.image_urls || []), data.publicUrl] }));
+      setMessage("Imagem adicionada. Você pode enviar outras fotos.");
+    } else {
+      setDraft((current) => ({ ...current, video_url: data.publicUrl }));
+      setMessage("Vídeo enviado com sucesso.");
+    }
   }
 
   async function uploadCategoryPhoto(file: File) {
@@ -136,7 +141,7 @@ function AdminPage() {
     const payload = {
       slug: draft.slug.trim() || draft.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       name: draft.name.trim(), category: draft.category, description: draft.description.trim(),
-      price: Number(draft.price), image_url: draft.image_url || null, video_url: draft.video_url || null,
+      price: Number(draft.price), image_url: draft.image_urls[0] || draft.image_url || null, image_urls: draft.image_urls, video_url: draft.video_url || null,
       is_active: draft.is_active,
     };
     const result = draft.id
@@ -274,9 +279,9 @@ function AdminPage() {
                 <label className="block text-sm font-medium text-slate-700">Preço (R$)<input required type="number" min="0" step="0.01" value={draft.price} onChange={e=>setDraft({...draft,price:e.target.value})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"/></label>
               </div>
               <label className="block text-sm font-medium text-slate-700">Descrição<textarea value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} rows={3} placeholder="Conte um pouco sobre este modelo..." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400"/></label>
-              <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><FileImage size={17} className="text-violet-600"/> Imagem do convite</span><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>e.target.files?.[0] && void uploadFile(e.target.files[0],"image")} className="mt-2 block w-full text-xs"/></label>
+              <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><FileImage size={17} className="text-violet-600"/> Fotos do convite (pode selecionar várias)</span><input type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{const files=Array.from(e.target.files || []); files.forEach(file=>void uploadFile(file,"image")); e.currentTarget.value="";}} className="mt-2 block w-full text-xs"/></label>
               <label className="block rounded-xl border border-dashed border-pink-200 bg-pink-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-pink-600"/> Vídeo (opcional)</span><input type="file" accept="video/mp4,video/webm" onChange={e=>e.target.files?.[0] && void uploadFile(e.target.files[0],"video")} className="mt-2 block w-full text-xs"/></label>
-              {draft.image_url && <img src={draft.image_url} alt="Prévia do convite" className="max-h-48 rounded-xl border object-contain"/>}
+              {draft.image_urls.length > 0 && <div className="grid grid-cols-3 gap-2">{draft.image_urls.map((url,index)=><div key={url} className="relative"><img src={url} alt={`Prévia ${index+1} do convite`} className="h-28 w-full rounded-xl border object-cover"/><button type="button" onClick={()=>setDraft(current=>({...current,image_urls:current.image_urls.filter(item=>item!==url),image_url:current.image_urls.filter(item=>item!==url)[0] || ""}))} className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-1 text-xs text-rose-600 shadow">Remover</button></div>)}</div>}
               {draft.video_url && <p className="text-xs text-emerald-700">Vídeo anexado com sucesso.</p>}
               <label className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input type="checkbox" checked={draft.is_active} onChange={e=>setDraft({...draft,is_active:e.target.checked})} className="h-4 w-4 accent-violet-600"/> Exibir este convite na loja</label>
               <div className="flex gap-2"><button disabled={saving} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-5 py-3.5 font-semibold text-white shadow-lg shadow-violet-200 disabled:opacity-50"><Save size={17}/>{saving ? "Salvando..." : "Salvar convite"}</button><button type="button" onClick={()=>setDraft(emptyDraft())} className="rounded-xl border border-slate-200 px-4 text-sm font-medium text-slate-600 hover:bg-slate-50">Limpar</button></div>
@@ -288,7 +293,7 @@ function AdminPage() {
             <div className="mt-5 space-y-3">
               {filteredRows.map(row=><article key={row.id} className="flex gap-3 rounded-2xl border border-slate-100 p-3 transition hover:border-violet-200 hover:bg-violet-50/30">
                 {row.image_url ? <img src={row.image_url} alt={row.name} className="h-24 w-20 shrink-0 rounded-xl bg-slate-100 object-cover"/> : <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-300"><FileImage size={25}/></div>}
-                <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{row.name}</p><span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${row.is_active?"bg-emerald-50 text-emerald-700":"bg-slate-100 text-slate-500"}`}>{row.is_active?"Ativo":"Oculto"}</span></div><p className="mt-1 text-xs text-slate-500">{row.category} · {money(Number(row.price))}</p><div className="mt-3 flex flex-wrap gap-3"><button type="button" onClick={()=>setDraft({...row,price:String(row.price),image_url:row.image_url??"",video_url:row.video_url??""})} className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-fuchsia-600"><Pencil size={13}/> Editar</button><button type="button" onClick={()=>void removeInvite(row.id)} className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600"><Trash2 size={13}/> Excluir</button></div></div>
+                <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{row.name}</p><span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${row.is_active?"bg-emerald-50 text-emerald-700":"bg-slate-100 text-slate-500"}`}>{row.is_active?"Ativo":"Oculto"}</span></div><p className="mt-1 text-xs text-slate-500">{row.category} · {money(Number(row.price))}</p><div className="mt-3 flex flex-wrap gap-3"><button type="button" onClick={()=>setDraft({...row,price:String(row.price),image_url:row.image_url??"",image_urls:row.image_urls?.length ? row.image_urls : (row.image_url ? [row.image_url] : []),video_url:row.video_url??""})} className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-fuchsia-600"><Pencil size={13}/> Editar</button><button type="button" onClick={()=>void removeInvite(row.id)} className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600"><Trash2 size={13}/> Excluir</button></div></div>
               </article>)}
               {filteredRows.length===0 && <div className="rounded-2xl border border-dashed border-slate-200 py-12 text-center"><FolderOpen className="mx-auto text-slate-300" size={30}/><p className="mt-3 text-sm font-medium text-slate-600">{query?"Nenhum convite encontrado.":"Seu catálogo está começando!"}</p><p className="mt-1 text-xs text-slate-400">{query?"Tente outra busca.":"Cadastre seu primeiro modelo no formulário ao lado."}</p></div>}
             </div>
