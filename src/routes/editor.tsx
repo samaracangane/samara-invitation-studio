@@ -82,7 +82,7 @@ function MagicEditor() {
       const localInvite = invites.find((item) => item.id === requestedInvite);
       if (localInvite) setRemoteInvite(null);
       else if (supabase) {
-        void supabase.from("invites").select("slug,name,category,description,price,image_url,video_url,fields").eq("slug", requestedInvite).eq("active", true).maybeSingle().then(({ data, error }) => {
+        void supabase.from("invites").select("slug,name,category,description,price,image_url,video_url,fields").eq("slug", requestedInvite).eq("is_active", true).maybeSingle().then(({ data, error }) => {
           if (!error && data) setRemoteInvite(mapSupabaseInvite(data));
           else setNotice("Could not load this catalog invitation. Return to the store and open it again.");
         });
