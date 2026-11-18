@@ -34,12 +34,13 @@ Deno.serve(async (request) => {
 
     const body = await request.json();
     const inviteSlug = typeof body.inviteSlug === "string" ? body.inviteSlug.trim() : "";
-    const email = typeof body.customerEmail === "string" ? body.customerEmail.trim().toLowerCase() : "";\n    const whatsapp = typeof body.customerWhatsapp === "string" ? body.customerWhatsapp.trim() : "";
+    const email = typeof body.customerEmail === "string" ? body.customerEmail.trim().toLowerCase() : "";
+    const whatsapp = typeof body.customerWhatsapp === "string" ? body.customerWhatsapp.trim() : "";
     const eventDetails = body.eventDetails && typeof body.eventDetails === "object" && !Array.isArray(body.eventDetails)
       ? body.eventDetails
       : {};
-    if (!inviteSlug || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return response({ error: "Informe um convite válido e um e-mail válido." }, 400);
+    if (!inviteSlug || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\+?[0-9()\s-]{10,20}$/.test(whatsapp)) {
+      return response({ error: "Informe um convite válido, e-mail e WhatsApp com DDD." }, 400);
     }
 
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
@@ -76,6 +77,7 @@ Deno.serve(async (request) => {
         amount_cents: amountCents,
         currency: "BRL",
         customer_email: email,
+        customer_whatsapp: whatsapp,
         event_details: eventDetails,
         payment_provider: "wiapy",
         provider_checkout_id: offer.checkout_id,
