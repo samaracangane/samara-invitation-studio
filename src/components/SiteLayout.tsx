@@ -14,6 +14,7 @@ export function Logo() {
 const nav = [
   { to: "/", label: "Início" },
   { to: "/catalogo", label: "Catálogo" },
+  { to: "/minha-conta", label: "Minha conta" },
   { to: "/sobre", label: "Sobre" },
   { to: "/contato", label: "Contato" },
 ] as const;
@@ -45,7 +46,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <footer className="mt-16 bg-[var(--color-sidebar)] text-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-3">
           <div><div className="inline-flex rounded-xl bg-white px-3 py-2"><Logo/></div><p className="mt-4 max-w-xs text-sm leading-6 text-white/65">Convites personalizados, digitais e animados para celebrar os momentos mais especiais da vida.</p></div>
-          <div><h3 className="font-display text-xl font-semibold">Navegue</h3><div className="mt-4 flex flex-col gap-3 text-sm text-white/70"><Link to="/" className="hover:text-white">Início</Link><Link to="/catalogo" className="hover:text-white">Catálogo de convites</Link><Link to="/sobre" className="hover:text-white">Sobre nós</Link><Link to="/contato" className="hover:text-white">Contato</Link></div></div>
+          <div><h3 className="font-display text-xl font-semibold">Navegue</h3><div className="mt-4 flex flex-col gap-3 text-sm text-white/70"><Link to="/" className="hover:text-white">Início</Link><Link to="/catalogo" className="hover:text-white">Catálogo de convites</Link><Link to="/minha-conta" className="hover:text-white">Minha conta</Link><Link to="/sobre" className="hover:text-white">Sobre nós</Link><Link to="/contato" className="hover:text-white">Contato</Link></div></div>
           <div><h3 className="font-display text-xl font-semibold">Vamos conversar?</h3><p className="mt-3 text-sm text-white/65">Estamos aqui para ajudar você a encontrar o convite ideal.</p><div className="mt-4 flex flex-wrap gap-3"><a href={waLink("Olá! Vim pelo site.")} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm hover:bg-white/20"><MessageCircle className="h-4 w-4"/> WhatsApp</a><a href={`https://instagram.com/${INSTAGRAM}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm hover:bg-white/20"><Instagram className="h-4 w-4"/> Instagram</a></div></div>
         </div>
         <div className="border-t border-white/10 px-5 py-4 text-center text-xs text-white/45">© {new Date().getFullYear()} Convites Digitais. Todos os direitos reservados.</div>

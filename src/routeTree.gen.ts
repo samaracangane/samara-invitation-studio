@@ -18,6 +18,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
 import { Route as RetornoRouteImport } from './routes/retorno'
+import { Route as MinhaContaRouteImport } from './routes/minha-conta'
+import { Route as AdminPedidosRouteImport } from './routes/admin-pedidos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,16 @@ const RetornoRoute = RetornoRouteImport.update({
   path: '/retorno',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MinhaContaRoute = MinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPedidosRoute = AdminPedidosRouteImport.update({
+  id: '/admin-pedidos',
+  path: '/admin-pedidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
@@ -75,6 +87,8 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
@@ -86,6 +100,8 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRoutesById {
   '/admin': typeof AdminRoute
@@ -98,13 +114,15 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/admin-pedidos': typeof AdminPedidosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
-  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno'
+  to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
+  id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,6 +135,8 @@ export interface RootRouteChildren {
   EditorRoute: typeof EditorRoute
   PagamentosRoute: typeof PagamentosRoute
   RetornoRoute: typeof RetornoRoute
+  MinhaContaRoute: typeof MinhaContaRoute
+  AdminPedidosRoute: typeof AdminPedidosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +204,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RetornoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/minha-conta': {
+      id: '/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof MinhaContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-pedidos': {
+      id: '/admin-pedidos'
+      path: '/admin-pedidos'
+      fullPath: '/admin-pedidos'
+      preLoaderRoute: typeof AdminPedidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -197,6 +231,8 @@ const rootRouteChildren: RootRouteChildren = {
   EditorRoute: EditorRoute,
   PagamentosRoute: PagamentosRoute,
   RetornoRoute: RetornoRoute,
+  MinhaContaRoute: MinhaContaRoute,
+  AdminPedidosRoute: AdminPedidosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

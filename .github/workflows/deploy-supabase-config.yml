@@ -39,3 +39,8 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: supabase functions deploy order-status --project-ref plgwbxdjynljffowkxqi --yes
+
+      - name: Deploy customer-orders
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy customer-orders --project-ref plgwbxdjynljffowkxqi --yes
