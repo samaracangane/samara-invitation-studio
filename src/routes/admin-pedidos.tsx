@@ -6,7 +6,8 @@ import { supabase } from "@/lib/supabase";
 type OrderRow = {
   id: string;
   invite_name: string;
-  customer_email: string | null;\n  customer_whatsapp?: string | null;
+  customer_email: string | null;
+  customer_whatsapp?: string | null;
   payment_status: string;
   fulfillment_status: string;
   created_at: string;
