@@ -4,11 +4,20 @@ import { ArrowLeft, Sparkles, WandSparkles, CreditCard } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCanvas } from "@/components/InviteCanvas";
-import { getInvite, waLink } from "@/data/invites";
+import { getInvite, mapSupabaseInvite, waLink } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/convite/$id")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
+    if (supabase) {
+      const { data } = await supabase
+        .from("invites")
+        .select("slug,name,category,description,price,image_url,video_url,fields")
+        .eq("slug", params.id)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (data) return { invite: mapSupabaseInvite(data) };
+    }
     const invite = getInvite(params.id);
     if (!invite) throw notFound();
     return { invite };
