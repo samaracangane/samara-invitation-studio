@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";\nimport { useEffect, useState } from "react";\nimport { InviteCard } from "@/components/InviteCard";\nimport { mapSupabaseInvite, type Invite } from "@/data/invites";\nimport { supabase } from "@/lib/supabase";
 import { ArrowRight, Heart, ShieldCheck, Sparkles, WandSparkles, Star, PartyPopper } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CATEGORIES } from "@/data/invites";
@@ -65,7 +65,7 @@ function Home() {
         <div className="absolute bottom-0 left-0 h-3 w-full bg-gradient-to-r from-[#ffe36e] via-[#ffb1d1] to-[#5de0d4]" />
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-12">
+      <section className="mx-auto max-w-6xl px-5 py-12">\n        <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><p className="font-script text-3xl text-primary">Escolha seu favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Convites em destaque</h2><p className="mt-2 text-sm text-muted-foreground">Veja os modelos disponíveis e escolha o que combina com sua festa.</p></div><Link to="/catalogo" className="text-sm font-bold text-primary hover:underline">Ver todos os convites →</Link></div>\n        {featuredInvites.length > 0 ? <div className="mb-12 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{featuredInvites.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <div className="mb-12 rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-muted-foreground">Novos convites estarão disponíveis aqui em breve.</div> }
         <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {CATEGORIES.map((category, index) => <Link key={category} to="/catalogo" className="group flex min-h-[122px] flex-col items-center justify-center gap-2 rounded-3xl border border-[#f2dce9] bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#e75a9d] hover:shadow-lg">
