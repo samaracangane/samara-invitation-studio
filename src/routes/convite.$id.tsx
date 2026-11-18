@@ -38,6 +38,13 @@ export const Route = createFileRoute("/convite/$id")({
 function InviteProduct() {
   const { invite } = Route.useLoaderData();
   const [customerEmail, setCustomerEmail] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [eventAge, setEventAge] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventTime, setEventTime] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventAddress, setEventAddress] = useState("");
+  const [eventMessage, setEventMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -53,7 +60,19 @@ function InviteProduct() {
     setBusy(true);
     setNotice("");
     const { data, error } = await supabase.functions.invoke("create-checkout", {
-      body: { inviteSlug: invite.id, customerEmail: customerEmail.trim().toLowerCase() },
+      body: {
+        inviteSlug: invite.id,
+        customerEmail: customerEmail.trim().toLowerCase(),
+        eventDetails: {
+          celebrantName: eventName.trim(),
+          age: eventAge.trim(),
+          eventDate,
+          eventTime,
+          location: eventLocation.trim(),
+          address: eventAddress.trim(),
+          message: eventMessage.trim(),
+        },
+      },
     });
     setBusy(false);
     if (error || !data?.checkoutUrl || !data?.orderId || !data?.accessToken) {
@@ -96,9 +115,38 @@ function InviteProduct() {
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Investimento</p>
               <p className="mt-2 font-display text-3xl font-semibold">{invite.price}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Personalize os dados da comemoração e finalize seu convite no editor online.</p>
-              <label className="mt-6 block text-sm font-semibold">Seu e-mail
-                <input type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
-              </label>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <h2 className="text-base font-semibold">Dados da festa</h2>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">Preencha as informações que deverão aparecer no convite. Elas serão enviadas junto com seu pedido antes do pagamento.</p>
+                </div>
+                <label className="block text-sm font-semibold">Nome do aniversariante *
+                  <input required value={eventName} onChange={(event) => setEventName(event.target.value)} maxLength={100} placeholder="Nome que aparecerá no convite" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <label className="block text-sm font-semibold">Idade que vai completar
+                  <input value={eventAge} onChange={(event) => setEventAge(event.target.value)} maxLength={30} placeholder="Ex.: 5 anos" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="block text-sm font-semibold">Data da festa *
+                    <input required type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                  </label>
+                  <label className="block text-sm font-semibold">Horário *
+                    <input required type="time" value={eventTime} onChange={(event) => setEventTime(event.target.value)} className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                  </label>
+                </div>
+                <label className="block text-sm font-semibold">Local da festa *
+                  <input required value={eventLocation} onChange={(event) => setEventLocation(event.target.value)} maxLength={160} placeholder="Ex.: Salão de festas, sítio, buffet..." className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <label className="block text-sm font-semibold">Endereço completo
+                  <input value={eventAddress} onChange={(event) => setEventAddress(event.target.value)} maxLength={240} placeholder="Rua, número, bairro e cidade" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <label className="block text-sm font-semibold">Observações ou mensagem extra
+                  <textarea value={eventMessage} onChange={(event) => setEventMessage(event.target.value)} maxLength={500} rows={3} placeholder="Informações adicionais para colocar no convite..." className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <label className="block text-sm font-semibold">Seu e-mail *
+                  <input required type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
+                </label>
+              </div>
               <button type="button" onClick={startCheckout} disabled={busy} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 disabled:cursor-wait disabled:opacity-60">
                 <CreditCard className="h-4 w-4"/>{busy ? "Preparando pagamento..." : "Comprar e personalizar"}
               </button>
