@@ -19,6 +19,7 @@ import { Route as EditorRouteImport } from './routes/editor'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
 import { Route as RetornoRouteImport } from './routes/retorno'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
+import { Route as AdminPedidosRouteImport } from './routes/admin-pedidos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const MinhaContaRoute = MinhaContaRouteImport.update({
   path: '/minha-conta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPedidosRoute = AdminPedidosRouteImport.update({
+  id: '/admin-pedidos',
+  path: '/admin-pedidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
@@ -107,7 +113,7 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
+  fullPaths: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta' | '/admin-pedidos'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
   id: '__root__' | '/' | '/catalogo' | '/contato' | '/sobre' | '/convite/$id' | '/editor' | '/pagamentos' | '/retorno' | '/minha-conta'
@@ -124,6 +130,7 @@ export interface RootRouteChildren {
   PagamentosRoute: typeof PagamentosRoute
   RetornoRoute: typeof RetornoRoute
   MinhaContaRoute: typeof MinhaContaRoute
+  AdminPedidosRoute: typeof AdminPedidosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MinhaContaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-pedidos': {
+      id: '/admin-pedidos'
+      path: '/admin-pedidos'
+      fullPath: '/admin-pedidos'
+      preLoaderRoute: typeof AdminPedidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -212,6 +226,7 @@ const rootRouteChildren: RootRouteChildren = {
   PagamentosRoute: PagamentosRoute,
   RetornoRoute: RetornoRoute,
   MinhaContaRoute: MinhaContaRoute,
+  AdminPedidosRoute: AdminPedidosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
