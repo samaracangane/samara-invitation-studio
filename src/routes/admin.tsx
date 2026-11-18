@@ -185,6 +185,7 @@ function AdminPage() {
           <a href="#catalogo" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><FolderOpen size={18}/> Meus convites</a>
           <a href="#categorias" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><BarChart3 size={18}/> Categorias</a>
           <a href="/pagamentos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><CreditCard size={18}/> Pagamentos Wiapy</a>
+          <a href="/admin-pedidos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-violet-100 transition hover:bg-white/10"><Package size={18}/> Pedidos e entregas</a>
         </nav>
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[.07] p-4">
           <div className="mb-2 flex items-center gap-2 text-amber-300"><Sparkles size={16}/><span className="text-xs font-semibold">Sua loja em destaque</span></div>
