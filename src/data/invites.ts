@@ -124,3 +124,28 @@ invites[1]!.fields = invites[0]!.fields;
 export const getInvite = (id: string) => invites.find((i) => i.id === id);
 
 export const waLink = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+
+export type SupabaseInviteRow = {
+  slug: string;
+  name: string;
+  category: Invite["category"];
+  description: string | null;
+  price: number | string;
+  image_url: string | null;
+  video_url: string | null;
+  fields: unknown;
+};
+
+export function mapSupabaseInvite(row: SupabaseInviteRow): Invite {
+  return {
+    id: row.slug,
+    name: row.name,
+    category: row.category,
+    description: row.description ?? "",
+    price: Number(row.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+    image: row.image_url || invites[0]!.image,
+    video: row.video_url || undefined,
+    fields: Array.isArray(row.fields) ? row.fields as TextField[] : [],
+  };
+}
