@@ -57,13 +57,14 @@ function AdminPedidos() {
   useEffect(() => {
     let alive = true;
     async function load() {
-      if (!supabase || !session?.user) { setAuthorized(false); setLoading(false); return; }
+      const client = supabase;
+      if (!client || !session?.user) { setAuthorized(false); setLoading(false); return; }
       setLoading(true);
-      const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
+      const { data: admin } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
       if (!alive) return;
       if (!admin) { setAuthorized(false); setLoading(false); setMessage("Esta conta não tem permissão administrativa."); return; }
       setAuthorized(true);
-      const { data, error } = await supabase.from("orders")
+      const { data, error } = await client.from("orders")
         .select("id,invite_id,invite_name,invite_image_url,customer_photo_path,customer_email,customer_whatsapp,payment_status,fulfillment_status,created_at,event_details")
         .order("created_at", { ascending: false });
       if (!alive) return;
@@ -71,13 +72,13 @@ function AdminPedidos() {
       else {
         const missingSlugs = [...new Set((data ?? []).filter((row: any) => !row.invite_image_url).map((row: any) => row.invite_id))];
         const { data: inviteRows } = missingSlugs.length
-          ? await supabase.from("invites").select("slug,image_url").in("slug", missingSlugs)
+          ? await client.from("invites").select("slug,image_url").in("slug", missingSlugs)
           : { data: [] as any[] };
         const inviteImages = Object.fromEntries((inviteRows ?? []).map((invite: any) => [invite.slug, invite.image_url]));
         const enriched = await Promise.all((data ?? []).map(async (row: any) => {
           let customerPhotoUrl: string | null = null;
           if (row.customer_photo_path) {
-            const { data: signed } = await supabase.storage.from("customer-uploads").createSignedUrl(row.customer_photo_path, 60 * 60);
+            const { data: signed } = await client.storage.from("customer-uploads").createSignedUrl(row.customer_photo_path, 60 * 60);
             customerPhotoUrl = signed?.signedUrl ?? null;
           }
           return { ...row, invite_image_url: row.invite_image_url || inviteImages[row.invite_id] || null, customerPhotoUrl };
