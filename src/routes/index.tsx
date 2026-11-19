@@ -95,6 +95,21 @@ function Home() {
 
       </section>
 
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Quem já comemorou com a gente</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Depoimentos de clientes</h2></div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { name: "Juliana M.", event: "Aniversário de 5 anos", text: "O convite ficou perfeito! Recebi rapidinho e todos os convidados elogiaram as cores." },
+            { name: "Patrícia S.", event: "Chá de bebê", text: "Atendimento carinhoso e um resultado lindo. Já escolhi o próximo para o aniversário dela." },
+            { name: "Renata L.", event: "Festa de 15 anos", text: "Super fácil de comprar e o convite chegou exatamente como eu imaginava. Recomendo muito!" },
+          ].map((d) => <figure key={d.name} className="rounded-3xl border border-[#f2dce9] bg-white p-6 shadow-sm">
+            <div className="text-lg text-[#ffb400]" aria-label="5 estrelas">★★★★★</div>
+            <blockquote className="mt-3 text-sm leading-6 text-[#60475f]">“{d.text}”</blockquote>
+            <figcaption className="mt-4"><span className="block font-bold text-foreground">{d.name}</span><span className="text-xs text-muted-foreground">{d.event}</span></figcaption>
+          </figure>)}
+        </div>
+      </section>
+
       <section className="mx-5 mb-16 overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#ff397d] via-[#a52be2] to-[#ff8a28] text-white shadow-xl md:mx-auto md:max-w-6xl">
         <div className="flex flex-col items-start justify-between gap-6 px-7 py-10 md:flex-row md:items-center md:px-12 md:py-12">
           <div><p className="font-script text-3xl text-[#ffe6a6]">Vamos comemorar?</p><h2 className="mt-1 font-display text-3xl font-bold md:text-4xl">Seu próximo convite começa aqui.</h2><p className="mt-2 max-w-xl text-sm text-white/90">Explore os modelos e encontre aquele que combina com a sua festa.</p></div>

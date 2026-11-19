@@ -4,7 +4,7 @@ import { ArrowLeft, Sparkles, CreditCard } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCanvas } from "@/components/InviteCanvas";
-import { mapSupabaseInvite, waLink } from "@/data/invites";
+import { mapSupabaseInvite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/convite/$id")({
@@ -89,7 +89,6 @@ function InviteProduct() {
     window.location.assign(data.checkoutUrl);
   }
 
-  const pedido = "Olá! Quero informações sobre o convite " + invite.name + ".";
 
   return (
     <SiteLayout>
@@ -160,11 +159,6 @@ function InviteProduct() {
                 <CreditCard className="h-4 w-4"/>{busy ? "Preparando pagamento..." : "Comprar e personalizar"}
               </button>
               {notice && <p role="status" className="mt-3 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900">{notice}</p>}
-            </div>
-            <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-sm sm:p-7">
-              <h2 className="font-display text-xl font-semibold">Prefere tirar dúvidas?</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Fale com a equipe antes de finalizar sua compra.</p>
-              <a href={waLink(pedido)} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center justify-center rounded-full bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground transition hover:opacity-90">Continuar pelo WhatsApp</a>
             </div>
           </section>
         </div>
