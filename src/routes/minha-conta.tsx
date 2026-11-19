@@ -8,6 +8,7 @@ type CustomerAsset = { type: string; label: string; downloadUrl: string };
 type CustomerOrder = {
   id: string;
   inviteName: string;
+  customerPhotoUrl?: string | null;
   amountCents: number;
   paymentStatus: string;
   fulfillmentStatus: string;
@@ -26,6 +27,7 @@ function MinhaConta() {
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [photoBusyId, setPhotoBusyId] = useState("");
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
@@ -62,6 +64,36 @@ function MinhaConta() {
   useEffect(() => {
     if (session?.user) void loadOrders();
   }, [session]);
+
+  async function uploadCustomerPhoto(order: CustomerOrder, file?: File) {
+    if (!supabase || !file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setMessage("Envie uma foto JPG, PNG ou WEBP.");
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setMessage("A foto deve ter até 15 MB.");
+      return;
+    }
+    setPhotoBusyId(order.id);
+    setMessage("");
+    const { data: signed, error: signError } = await supabase.functions.invoke("customer-photo-upload", {
+      body: { orderId: order.id },
+    });
+    if (signError || !signed?.path || !signed?.token) {
+      setMessage(signed?.error || signError?.message || "Não foi possível preparar o envio.");
+      setPhotoBusyId("");
+      return;
+    }
+    const { error } = await supabase.storage.from("customer-uploads")
+      .uploadToSignedUrl(signed.path, signed.token, file, { contentType: file.type, upsert: true });
+    if (error) setMessage("Não foi possível enviar a foto: " + error.message);
+    else {
+      setMessage("Foto enviada! Nossa equipe poderá usá-la na personalização do convite.");
+      await loadOrders();
+    }
+    setPhotoBusyId("");
+  }
 
   async function sendAccessLink(event: FormEvent) {
     event.preventDefault();
@@ -107,6 +139,15 @@ function MinhaConta() {
                       <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">{order.paymentStatus === "approved" ? "Pagamento aprovado" : "Aguardando pagamento"}</span>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{order.fulfillmentStatus === "delivered" ? "Seu convite está pronto!" : order.fulfillmentStatus === "in_progress" ? "Estamos preparando seu convite." : "Seu pedido está aguardando preparação."}</p>
+                    {order.paymentStatus === "approved" && <div className="mt-4 rounded-xl border border-dashed border-primary/30 bg-secondary/30 p-3">
+                      <p className="text-sm font-semibold">Enviar foto para colocar no convite</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Envie uma foto JPG, PNG ou WEBP de até 15 MB. Você pode substituir a foto enquanto o pedido estiver sendo preparado.</p>
+                      {order.customerPhotoUrl && <img src={order.customerPhotoUrl} alt="Foto enviada para personalização" className="mt-3 h-24 w-24 rounded-xl border object-cover"/>}
+                      <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-primary/20 bg-background px-4 py-2 text-xs font-semibold text-primary">
+                        {photoBusyId === order.id ? "Enviando foto..." : order.customerPhotoUrl ? "Trocar foto" : "Escolher foto"}
+                        <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={Boolean(photoBusyId)} onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadCustomerPhoto(order, file); event.currentTarget.value = ""; }}/>
+                      </label>
+                    </div>}
                     {order.assets?.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{order.assets.map((asset) => (
                       <a key={asset.type} href={asset.downloadUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"><Download size={16}/>{asset.label}</a>
                     ))}</div>}
