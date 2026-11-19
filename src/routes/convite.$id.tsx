@@ -100,7 +100,7 @@ function InviteProduct() {
         <div className="mb-7">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-secondary px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary"><Sparkles className="h-3.5 w-3.5"/> Convite personalizável</span>
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{invite.name}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{invite.description}</p>
+          <p className="mt-2 max-w-2xl whitespace-pre-line text-sm leading-6 text-muted-foreground">{invite.description}</p>
         </div>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:gap-10">
           <section className="rounded-3xl border border-border/70 bg-card p-3 shadow-sm sm:p-5">
