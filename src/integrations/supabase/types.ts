@@ -139,6 +139,7 @@ export type Database = {
           currency: string
           customer_email: string | null
           customer_name: string | null
+          customer_photo_path: string | null
           customer_whatsapp: string | null
           event_details: Json
           final_image_path: string | null
@@ -149,6 +150,7 @@ export type Database = {
           id: string
           idempotency_key: string
           invite_id: string
+          invite_image_url: string | null
           invite_name: string
           offer_id: string | null
           paid_at: string | null
@@ -166,6 +168,7 @@ export type Database = {
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          customer_photo_path?: string | null
           customer_whatsapp?: string | null
           event_details?: Json
           final_image_path?: string | null
@@ -176,6 +179,7 @@ export type Database = {
           id?: string
           idempotency_key: string
           invite_id: string
+          invite_image_url?: string | null
           invite_name: string
           offer_id?: string | null
           paid_at?: string | null
@@ -193,6 +197,7 @@ export type Database = {
           currency?: string
           customer_email?: string | null
           customer_name?: string | null
+          customer_photo_path?: string | null
           customer_whatsapp?: string | null
           event_details?: Json
           final_image_path?: string | null
@@ -203,6 +208,7 @@ export type Database = {
           id?: string
           idempotency_key?: string
           invite_id?: string
+          invite_image_url?: string | null
           invite_name?: string
           offer_id?: string | null
           paid_at?: string | null
@@ -295,7 +301,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_upload_order_photo: {
+        Args: { order_folder: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
