@@ -29,7 +29,7 @@ function Home() {
     let alive = true;
     async function load() {
       if (!supabase) return;
-      const { data } = await supabase.from("invites").select("slug,name,category,description,price,image_url,image_urls,video_url,fields,is_featured,is_new").eq("is_active", true).order("created_at", { ascending: false }).limit(8);
+      const { data } = await supabase.from("invites").select("slug,name,category,description,price,image_url,image_urls,video_url,fields,is_featured,is_new").eq("is_active", true).order("created_at", { ascending: false });
       if (alive && data) { setFeaturedInvites(data.filter((row) => row.is_featured).map((row) => mapSupabaseInvite(row))); setLaunchInvites(data.filter((row) => row.is_new).map((row) => mapSupabaseInvite(row))); }
       const { data: categoryData } = await supabase.from("category_media").select("category,image_url");
       if (alive && categoryData) setCategoryImages(Object.fromEntries(categoryData.map((row) => [row.category, row.image_url])));
