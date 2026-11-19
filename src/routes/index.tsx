@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { ArrowRight, Heart, ShieldCheck, Sparkles, WandSparkles, Star, PartyPopper } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CATEGORIES } from "@/data/invites";
+import blueyInvite from "@/assets/convite-bluey-helena.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,16 +65,11 @@ function Home() {
             <div className="absolute right-3 top-3 flex h-16 w-16 rotate-12 items-center justify-center rounded-2xl bg-[#ffe36e] text-[#71317b] shadow-xl"><PartyPopper className="h-8 w-8" /></div>
             <div className="absolute bottom-5 left-0 flex h-14 w-14 -rotate-12 items-center justify-center rounded-full bg-[#58d9d0] text-[#54205e] shadow-xl"><Sparkles className="h-7 w-7" /></div>
             <div className="relative w-[78%] rotate-[-5deg] rounded-[2rem] border-[8px] border-white/90 bg-white p-3 shadow-2xl">
-              <div className="overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#8ee6f4] via-[#c7f3ff] to-[#ffe69a] px-5 py-9 text-center text-[#174f79]">
-                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/80 bg-[#42b9df] text-6xl shadow-lg">🐶</div>
-                <p className="mt-4 font-display text-2xl font-extrabold tracking-wide text-[#176ca0]">BLUEY</p>
-                <p className="mt-2 font-script text-3xl">Você está convidado!</p>
-                <p className="mt-2 font-display text-4xl font-bold leading-tight">VAMOS<br/>COMEMORAR?</p>
-                <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#239ac8]" />
-                <p className="mt-4 text-xs font-bold uppercase tracking-[.22em]">Uma aventura divertida</p>
+              <div className="overflow-hidden rounded-[1.35rem] bg-white">
+                <img src={blueyInvite.url} alt="Convite Bluey da Helena, 5 anos — 23/05 às 16h30 no Salão de Festas Doce Infância" className="block h-auto w-full" />
               </div>
             </div>
-            <div className="absolute bottom-9 right-0 w-[31%] rotate-[8deg] rounded-2xl border-4 border-white bg-gradient-to-br from-[#fff1a8] to-[#ff8bb8] p-3 text-center text-[#69315e] shadow-2xl">
+            <div className="absolute -left-[7%] top-10 w-[31%] -rotate-[8deg] rounded-2xl border-4 border-white bg-gradient-to-br from-[#fff1a8] to-[#ff8bb8] p-3 text-center text-[#69315e] shadow-2xl">
               <Heart className="mx-auto h-7 w-7 fill-[#e84b8a] text-[#e84b8a]" />
               <p className="mt-2 font-display text-xl font-bold">Feito com carinho</p>
               <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider">Para celebrar!</p>
