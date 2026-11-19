@@ -39,7 +39,7 @@ Deno.serve(async (request) => {
     });
     const { data: orders, error } = await admin
       .from("orders")
-      .select("id,invite_name,amount_cents,payment_status,fulfillment_status,created_at,final_video_path,final_image_path,final_pdf_path")
+      .select("id,invite_name,amount_cents,payment_status,fulfillment_status,created_at,final_video_path,final_image_path,final_pdf_path,customer_photo_path")
       .ilike("customer_email", email)
       .order("created_at", { ascending: false });
 
@@ -47,6 +47,12 @@ Deno.serve(async (request) => {
 
     const result = await Promise.all((orders ?? []).map(async (order) => {
       const assets: { type: string; label: string; downloadUrl: string }[] = [];
+      let customerPhotoUrl: string | null = null;
+      if (order.customer_photo_path && order.payment_status === "approved") {
+        const { data: photo } = await admin.storage.from("customer-uploads")
+          .createSignedUrl(order.customer_photo_path, 60 * 60);
+        customerPhotoUrl = photo?.signedUrl ?? null;
+      }
       if (order.payment_status === "approved") {
         const candidates = [
           { path: order.final_video_path, type: "video", label: "Baixar convite MP4" },
@@ -67,6 +73,7 @@ Deno.serve(async (request) => {
         paymentStatus: order.payment_status,
         fulfillmentStatus: order.fulfillment_status,
         createdAt: order.created_at,
+        customerPhotoUrl,
         assets,
       };
     }));
