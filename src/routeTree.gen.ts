@@ -17,6 +17,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as PagamentosRouteImport } from './routes/pagamentos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as RetornoRouteImport } from './routes/retorno'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ConviteIdRouteImport } from './routes/convite.$id'
@@ -61,6 +62,11 @@ const PagamentosRoute = PagamentosRouteImport.update({
   path: '/pagamentos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RetornoRoute = RetornoRouteImport.update({
   id: '/retorno',
   path: '/retorno',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/editor': typeof EditorRoute
   '/minha-conta': typeof MinhaContaRoute
   '/pagamentos': typeof PagamentosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/editor': typeof EditorRoute
   '/minha-conta': typeof MinhaContaRoute
   '/pagamentos': typeof PagamentosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/editor': typeof EditorRoute
   '/minha-conta': typeof MinhaContaRoute
   '/pagamentos': typeof PagamentosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/editor'
     | '/minha-conta'
     | '/pagamentos'
+    | '/privacidade'
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/editor'
     | '/minha-conta'
     | '/pagamentos'
+    | '/privacidade'
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/editor'
     | '/minha-conta'
     | '/pagamentos'
+    | '/privacidade'
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   EditorRoute: typeof EditorRoute
   MinhaContaRoute: typeof MinhaContaRoute
   PagamentosRoute: typeof PagamentosRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   RetornoRoute: typeof RetornoRoute
   SobreRoute: typeof SobreRoute
   ConviteIdRoute: typeof ConviteIdRoute
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PagamentosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/retorno': {
       id: '/retorno'
       path: '/retorno'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   EditorRoute: EditorRoute,
   MinhaContaRoute: MinhaContaRoute,
   PagamentosRoute: PagamentosRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   RetornoRoute: RetornoRoute,
   SobreRoute: SobreRoute,
   ConviteIdRoute: ConviteIdRoute,

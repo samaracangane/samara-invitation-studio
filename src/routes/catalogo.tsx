@@ -7,7 +7,12 @@ import { mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
-  validateSearch: (search: Record<string, unknown>): { categoria?: string; busca?: string } => ({ categoria: typeof search.categoria === "string" ? search.categoria : undefined, busca: typeof search.busca === "string" ? search.busca : undefined }),
+  validateSearch: (search: Record<string, unknown>): { categoria?: string; busca?: string } => {
+    const result: { categoria?: string; busca?: string } = {};
+    if (typeof search["categoria"] === "string") result.categoria = search["categoria"];
+    if (typeof search["busca"] === "string") result.busca = search["busca"];
+    return result;
+  },
   head: () => ({
     meta: [
       { title: "Catálogo de Convites — Samara Criar Art's Convites" },

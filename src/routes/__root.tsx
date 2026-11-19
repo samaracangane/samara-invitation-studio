@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CookieConsent } from "../components/CookieConsent";
+import { initMetaPixel } from "../lib/meta-pixel";
 
 function NotFoundComponent() {
   return (
@@ -92,6 +94,56 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:wght@500;600;700&family=Fredoka:wght@500;600;700&family=Great+Vibes&family=Jost:wght@400;500&display=swap" },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
+    scripts: [
+      {
+        children: `window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
+gtag("consent", "default", {
+  analytics_storage: "granted",
+  ad_storage: "granted",
+  ad_user_data: "granted",
+  ad_personalization: "granted",
+});
+gtag("consent", "default", {
+  analytics_storage: "denied",
+  ad_storage: "denied",
+  ad_user_data: "denied",
+  ad_personalization: "denied",
+  wait_for_update: 500,
+  region:
+    "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH,RE,GP,MQ,GF,YT,MF,AX,CA-QC".split(
+      ",",
+    ),
+});
+(function () {
+  var signals = {
+    analytics: ["analytics_storage"],
+    advertising: ["ad_storage", "ad_user_data", "ad_personalization"],
+  };
+  for (var purpose in signals) {
+    var choice = null;
+    try {
+      var saved = JSON.parse(localStorage.getItem("cookie_consent_" + purpose) || "null");
+      if (
+        saved &&
+        (saved.choice === "denied" || (saved.choice === "granted" && Date.now() - saved.at < 365 * 86400000))
+      ) {
+        choice = saved.choice;
+      }
+    } catch (e) {}
+    if (navigator.globalPrivacyControl === true) choice = "denied";
+    if (!choice) continue;
+    var update = {};
+    signals[purpose].forEach(function (signal) {
+      update[signal] = choice;
+    });
+    gtag("consent", "update", update);
+  }
+})();`,
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -116,10 +168,15 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    initMetaPixel();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <CookieConsent />
     </QueryClientProvider>
   );
 }
