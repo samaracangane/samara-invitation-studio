@@ -7,10 +7,7 @@ import { mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
-  validateSearch: (search: Record<string, unknown>): { categoria?: string } => {
-    const categoria = search["categoria"];
-    return typeof categoria === "string" ? { categoria } : {};
-  },
+  validateSearch: (search: Record<string, unknown>): { categoria?: string; busca?: string } => ({ categoria: typeof search.categoria === "string" ? search.categoria : undefined, busca: typeof search.busca === "string" ? search.busca : undefined }),
   head: () => ({
     meta: [
       { title: "Catálogo de Convites — Samara Criar Art's Convites" },
@@ -26,8 +23,8 @@ function Catalogo() {
   const { categoria, busca } = Route.useSearch();
   const [cat, setCat] = useState<string>(categoria ?? "Todos");
   useEffect(() => { setCat(categoria ?? "Todos"); }, [categoria]);
-  useEffect(() => { setSearch(busca ?? ""); }, [busca]);
   const [search, setSearch] = useState(busca ?? "");
+  useEffect(() => { setSearch(busca ?? ""); }, [busca]);
   const [catalogInvites, setCatalogInvites] = useState<Invite[]>([]);
 
   useEffect(() => {
