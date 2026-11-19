@@ -8,7 +8,7 @@ type Diagnostics = { webhookTokenConfigured: boolean; serviceRoleConfigured: boo
 const money = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const Route = createFileRoute("/pagamentos")({
-  head: () => ({ meta: [{ title: "Pagamentos Wiapy — Samara’s Enchanted Invite" }] }),
+  head: () => ({ meta: [{ title: "Pagamentos Wiapy — Samara Criar Art's Convites" }] }),
   component: PaymentSettings,
 });
 

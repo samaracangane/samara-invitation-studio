@@ -34,7 +34,7 @@ const deliveryTypes = {
 type DeliveryKind = keyof typeof deliveryTypes;
 
 export const Route = createFileRoute("/admin-pedidos")({
-  head: () => ({ meta: [{ title: "Entregas de convites — Samara’s Enchanted Invite" }] }),
+  head: () => ({ meta: [{ title: "Entregas de convites — Samara Criar Art's Convites" }] }),
   component: AdminPedidos,
 });
 

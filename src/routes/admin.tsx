@@ -28,7 +28,7 @@ const emptyDraft = (): Draft => ({
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Painel administrativo — Samara’s Enchanted Invite" }] }),
+  head: () => ({ meta: [{ title: "Painel administrativo — Samara Criar Art's Convites" }] }),
   component: AdminPage,
 });
 
@@ -197,7 +197,7 @@ function AdminPage() {
       <aside className={`${menuOpen ? "block" : "hidden"} fixed inset-y-0 left-0 z-40 w-[270px] flex-col bg-gradient-to-b from-[#281b3d] via-[#302044] to-[#21182f] px-5 py-7 text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:h-screen lg:shrink-0`}>
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-amber-300"><Crown size={29}/></div>
-          <div><p className="font-display text-xl leading-none">Samara’s</p><p className="mt-1 text-[10px] font-semibold uppercase tracking-[.2em] text-violet-200">Enchanted Invite</p></div>
+          <div><p className="font-display text-xl leading-none">Samara Criar Art's</p><p className="mt-1 text-[10px] font-semibold uppercase tracking-[.2em] text-violet-200">Convites</p></div>
         </div>
         <p className="mb-8 mt-5 px-2 text-xs leading-5 text-violet-200/75">Transforme momentos em lembranças especiais.</p>
         <nav className="space-y-2 text-sm">

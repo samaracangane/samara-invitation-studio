@@ -22,9 +22,9 @@ export const Route = createFileRoute("/convite/$id")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: loaderData.invite.name + " — Samara’s Enchanted Invite" },
+          { title: loaderData.invite.name + " — Samara Criar Art's Convites" },
           { name: "description", content: loaderData.invite.description },
-          { property: "og:title", content: loaderData.invite.name + " — Samara’s Enchanted Invite" },
+          { property: "og:title", content: loaderData.invite.name + " — Samara Criar Art's Convites" },
           { property: "og:description", content: loaderData.invite.description },
         ]
       : [{ title: "Convite não encontrado" }, { name: "robots", content: "noindex" }],

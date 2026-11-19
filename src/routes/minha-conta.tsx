@@ -17,7 +17,7 @@ type CustomerOrder = {
 };
 
 export const Route = createFileRoute("/minha-conta")({
-  head: () => ({ meta: [{ title: "Minha conta — Samara’s Enchanted Invite" }] }),
+  head: () => ({ meta: [{ title: "Minha conta — Samara Criar Art's Convites" }] }),
   component: MinhaConta,
 });
 

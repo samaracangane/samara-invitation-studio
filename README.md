@@ -1,4 +1,4 @@
-# Samara Invitation Studio
+# Samara Criar Art's Convites
 
 https://www.collorgraph.com.br/ análise de forma minuciosa esse site e faça um para mim exatamente igual, idêntico uma clonagem e com todos os convites idênticos adicionado colocando a logomarca Samara Criar Art's,  quero extremamente igual sem mudar nada, apenas a logomarca
 

@@ -6,9 +6,9 @@ import { INSTAGRAM } from "@/data/invites";
 export const Route = createFileRoute("/contato")({
   head: () => ({
     meta: [
-      { title: "Contato — Samara Invitation Studio" },
-      { name: "description", content: "Acompanhe a Samara Invitation Studio no Instagram." },
-      { property: "og:title", content: "Contato — Samara Invitation Studio" },
+      { title: "Contato — Samara Criar Art's Convites" },
+      { name: "description", content: "Acompanhe a Samara Criar Art's Convites no Instagram." },
+      { property: "og:title", content: "Contato — Samara Criar Art's Convites" },
       { property: "og:description", content: "Acompanhe novidades e inspirações para sua comemoração." },
     ],
   }),

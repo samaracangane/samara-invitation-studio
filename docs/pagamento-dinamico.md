@@ -1,4 +1,4 @@
-# Pagamentos Wiapy e editor — Samara’s Enchanted Invite
+# Pagamentos Wiapy e editor — Samara Criar Art's Convites
 
 ## O que já está preparado no repositório
 

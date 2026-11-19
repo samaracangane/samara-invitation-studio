@@ -11,9 +11,9 @@ import blueyInvite from "@/assets/convite-bluey-helena.jpg.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Samara Invitation Studio — Convites digitais para momentos inesquecíveis" },
-      { name: "description", content: "Encontre o convite digital perfeito para sua comemoração na Samara Invitation Studio." },
-      { property: "og:title", content: "Samara Invitation Studio — Seu momento merece um convite especial" },
+      { title: "Samara Criar Art's Convites — Convites digitais para momentos inesquecíveis" },
+      { name: "description", content: "Encontre o convite digital perfeito para sua comemoração na Samara Criar Art's Convites." },
+      { property: "og:title", content: "Samara Criar Art's Convites — Seu momento merece um convite especial" },
       { property: "og:description", content: "Convites digitais e animados para celebrar momentos especiais." },
     ],
   }),

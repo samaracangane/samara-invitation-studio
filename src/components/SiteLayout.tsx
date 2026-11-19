@@ -5,8 +5,8 @@ import { INSTAGRAM } from "@/data/invites";
 
 export function Logo() {
   return (
-    <Link to="/" className="group flex items-center" aria-label="Samara Invitation Studio - página inicial">
-      <img src="/logo-convites-digitais.svg" alt="Samara Invitation Studio" className="h-12 w-auto max-w-[220px] object-contain transition group-hover:scale-[1.02] sm:h-14" />
+    <Link to="/" className="group flex items-center" aria-label="Samara Criar Art's Convites - página inicial">
+      <img src="/logo-convites-digitais.svg" alt="Samara Criar Art's Convites" className="h-12 w-auto max-w-[220px] object-contain transition group-hover:scale-[1.02] sm:h-14" />
     </Link>
   );
 }
@@ -25,7 +25,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen font-sans">
       <div className="bg-[var(--color-sidebar)] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-2 text-center text-[11px] font-medium tracking-wide sm:text-xs">
-          <Sparkles className="mr-2 h-3.5 w-3.5 text-[var(--color-gold)]"/> Samara Invitation Studio · convites digitais para celebrar momentos inesquecíveis
+          <Sparkles className="mr-2 h-3.5 w-3.5 text-[var(--color-gold)]"/> Samara Criar Art's Convites · convites digitais para celebrar momentos inesquecíveis
         </div>
       </div>
       <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 shadow-sm backdrop-blur-xl">
@@ -47,7 +47,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <div><h3 className="font-display text-xl font-semibold">Navegue</h3><div className="mt-4 flex flex-col gap-3 text-sm text-white/70"><Link to="/" className="hover:text-white">Início</Link><Link to="/catalogo" className="hover:text-white">Catálogo de convites</Link><Link to="/minha-conta" className="hover:text-white">Minha conta</Link><Link to="/sobre" className="hover:text-white">Sobre nós</Link><Link to="/contato" className="hover:text-white">Contato</Link></div></div>
           <div><h3 className="font-display text-xl font-semibold">Acompanhe novidades</h3><p className="mt-3 text-sm text-white/65">Siga nossas novidades e inspirações para sua próxima comemoração.</p><div className="mt-4 flex flex-wrap gap-3"><a href={`https://instagram.com/${INSTAGRAM}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm hover:bg-white/20"><Instagram className="h-4 w-4"/> Instagram</a></div></div>
         </div>
-        <div className="border-t border-white/10 px-5 py-4 text-center text-xs text-white/45">© {new Date().getFullYear()} Samara Invitation Studio. Todos os direitos reservados.</div>
+        <div className="border-t border-white/10 px-5 py-4 text-center text-xs text-white/45">© {new Date().getFullYear()} Samara Criar Art's Convites. Todos os direitos reservados.</div>
       </footer>
     </div>
   );

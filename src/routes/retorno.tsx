@@ -7,7 +7,7 @@ type SavedOrder = { orderId: string; accessToken: string; inviteId: string };
 type OrderState = { status: string; inviteId: string; inviteName: string; amountCents: number };
 
 export const Route = createFileRoute("/retorno")({
-  head: () => ({ meta: [{ title: "Status do pedido — Samara’s Enchanted Invite" }] }),
+  head: () => ({ meta: [{ title: "Status do pedido — Samara Criar Art's Convites" }] }),
   component: ReturnPage,
 });
 
@@ -52,7 +52,7 @@ function ReturnPage() {
     <main className="grid min-h-screen place-items-center bg-[#f8f6fb] px-4 py-10 text-[#302342]">
       <section className="w-full max-w-lg rounded-3xl border border-violet-100 bg-white p-7 text-center shadow-sm sm:p-10">
         {paid ? <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-600"/> : order && order.status !== "pending" ? <XCircle className="mx-auto h-14 w-14 text-rose-500"/> : <Clock3 className="mx-auto h-14 w-14 text-amber-500"/>}
-        <p className="mt-5 text-xs font-semibold uppercase tracking-[.18em] text-violet-600">Samara’s Enchanted Invite</p>
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[.18em] text-violet-600">Samara Criar Art's Convites</p>
         <h1 className="mt-2 font-display text-3xl font-semibold">{paid ? "Tudo certo!" : "Conferindo pagamento"}</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">{message}</p>
         {order && <div className="mt-5 rounded-xl bg-slate-50 p-4 text-left text-sm"><p className="font-semibold">{order.inviteName}</p><p className="mt-1 text-slate-500">Valor: {(order.amountCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p><p className="mt-1 text-xs text-slate-500">Status: {order.status}</p></div>}

@@ -7,10 +7,13 @@ import { mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
-  validateSearch: (search: Record<string, unknown>) => ({ categoria: typeof search.categoria === "string" ? search.categoria : undefined }),
+  validateSearch: (search: Record<string, unknown>): { categoria?: string } => {
+    const categoria = search["categoria"];
+    return typeof categoria === "string" ? { categoria } : {};
+  },
   head: () => ({
     meta: [
-      { title: "Catálogo de Convites — Samara’s Enchanted Invite" },
+      { title: "Catálogo de Convites — Samara Criar Art's Convites" },
       { name: "description", content: "Encontre seu convite ideal: modelos infantis, casamento e 15 anos, em imagem e vídeo." },
       { property: "og:title", content: "Catálogo de Convites — Convites Digitais" },
       { property: "og:description", content: "Explore nosso catálogo de convites personalizáveis." },
