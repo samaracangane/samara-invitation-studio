@@ -7,6 +7,7 @@ type OrderRow = {
   id: string;
   invite_name: string;
   invite_image_url: string | null;
+  invite_video_url: string | null;
   customer_photo_path: string | null;
   customerPhotoUrl?: string | null;
   customer_email: string | null;
@@ -70,18 +71,18 @@ function AdminPedidos() {
       if (!alive) return;
       if (error) setMessage("Não foi possível carregar os pedidos. Confira se as migrações da área do cliente foram aplicadas.");
       else {
-        const missingSlugs = [...new Set((data ?? []).filter((row: any) => !row.invite_image_url).map((row: any) => row.invite_id))];
-        const { data: inviteRows } = missingSlugs.length
-          ? await client.from("invites").select("slug,image_url").in("slug", missingSlugs)
+        const inviteSlugs = [...new Set((data ?? []).map((row: any) => row.invite_id).filter(Boolean))];
+        const { data: inviteRows } = inviteSlugs.length
+          ? await client.from("invites").select("slug,image_url,video_url").in("slug", inviteSlugs)
           : { data: [] as any[] };
-        const inviteImages = Object.fromEntries((inviteRows ?? []).map((invite: any) => [invite.slug, invite.image_url]));
+        const inviteMedia = Object.fromEntries((inviteRows ?? []).map((invite: any) => [invite.slug, { image: invite.image_url, video: invite.video_url }]));
         const enriched = await Promise.all((data ?? []).map(async (row: any) => {
           let customerPhotoUrl: string | null = null;
           if (row.customer_photo_path) {
             const { data: signed } = await client.storage.from("customer-uploads").createSignedUrl(row.customer_photo_path, 60 * 60);
             customerPhotoUrl = signed?.signedUrl ?? null;
           }
-          return { ...row, invite_image_url: row.invite_image_url || inviteImages[row.invite_id] || null, customerPhotoUrl };
+          return { ...row, invite_image_url: row.invite_image_url || inviteMedia[row.invite_id]?.image || null, invite_video_url: inviteMedia[row.invite_id]?.video || null, customerPhotoUrl };
         }));
         if (alive) setOrders(enriched as OrderRow[]);
       }
@@ -143,7 +144,7 @@ function AdminPedidos() {
           {orders.map((order) => <article key={order.id} className="rounded-2xl border border-violet-100 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
-                {order.invite_image_url ? <img src={order.invite_image_url} alt={order.invite_name} className="h-24 w-20 shrink-0 rounded-xl border border-violet-100 object-cover"/> : <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-300"><FileImage size={25}/></div>}
+                {order.invite_video_url ? <video src={order.invite_video_url} controls playsInline preload="metadata" className="h-24 w-20 shrink-0 rounded-xl border border-violet-100 bg-black object-cover" aria-label={`Prévia em vídeo: ${order.invite_name}`}/> : order.invite_image_url ? <img src={order.invite_image_url} alt={order.invite_name} className="h-24 w-20 shrink-0 rounded-xl border border-violet-100 object-cover"/> : <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-300"><FileImage size={25}/></div>}
                 <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-sm font-semibold text-violet-700">WhatsApp: {order.customer_whatsapp || "Não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div></div>
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">{order.payment_status === "approved" ? "Pago" : order.payment_status}</span>
             </div>
