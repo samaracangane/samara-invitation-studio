@@ -6,6 +6,9 @@ import { supabase } from "@/lib/supabase";
 type OrderRow = {
   id: string;
   invite_name: string;
+  invite_image_url: string | null;
+  customer_photo_path: string | null;
+  customerPhotoUrl?: string | null;
   customer_email: string | null;
   customer_whatsapp?: string | null;
   payment_status: string;
@@ -61,11 +64,21 @@ function AdminPedidos() {
       if (!admin) { setAuthorized(false); setLoading(false); setMessage("Esta conta não tem permissão administrativa."); return; }
       setAuthorized(true);
       const { data, error } = await supabase.from("orders")
-        .select("id,invite_name,customer_email,customer_whatsapp,payment_status,fulfillment_status,created_at,event_details")
+        .select("id,invite_name,invite_image_url,customer_photo_path,customer_email,customer_whatsapp,payment_status,fulfillment_status,created_at,event_details")
         .order("created_at", { ascending: false });
       if (!alive) return;
-      if (error) setMessage("Não foi possível carregar os pedidos. Confira se a migração da área do cliente foi aplicada.");
-      else setOrders((data ?? []) as OrderRow[]);
+      if (error) setMessage("Não foi possível carregar os pedidos. Confira se as migrações da área do cliente foram aplicadas.");
+      else {
+        const enriched = await Promise.all((data ?? []).map(async (row: any) => {
+          let customerPhotoUrl: string | null = null;
+          if (row.customer_photo_path) {
+            const { data: signed } = await supabase.storage.from("customer-uploads").createSignedUrl(row.customer_photo_path, 60 * 60);
+            customerPhotoUrl = signed?.signedUrl ?? null;
+          }
+          return { ...row, customerPhotoUrl };
+        }));
+        if (alive) setOrders(enriched as OrderRow[]);
+      }
       setLoading(false);
     }
     void load();
@@ -123,9 +136,15 @@ function AdminPedidos() {
         <section className="mt-6 space-y-3">
           {orders.map((order) => <article key={order.id} className="rounded-2xl border border-violet-100 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-sm font-semibold text-violet-700">WhatsApp: {order.customer_whatsapp || "Não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div>
+              <div className="flex min-w-0 items-start gap-3">
+                {order.invite_image_url ? <img src={order.invite_image_url} alt={order.invite_name} className="h-24 w-20 shrink-0 rounded-xl border border-violet-100 object-cover"/> : <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-300"><FileImage size={25}/></div>}
+                <div><h2 className="font-semibold">{order.invite_name}</h2><p className="mt-1 text-sm text-slate-500">{order.customer_email || "E-mail não informado"}</p><p className="mt-1 text-sm font-semibold text-violet-700">WhatsApp: {order.customer_whatsapp || "Não informado"}</p><p className="mt-1 text-xs text-slate-400">Pedido {new Date(order.created_at).toLocaleDateString("pt-BR")}</p></div></div>
               <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">{order.payment_status === "approved" ? "Pago" : order.payment_status}</span>
             </div>
+            {order.customerPhotoUrl && <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800">Foto enviada pelo cliente</h3>
+              <a href={order.customerPhotoUrl} target="_blank" rel="noreferrer"><img src={order.customerPhotoUrl} alt="Foto de referência enviada pelo cliente" className="mt-3 h-36 w-36 rounded-xl border border-amber-200 object-cover"/></a>
+            </div>}
             {order.event_details && <div className="mt-4 rounded-xl bg-violet-50/70 p-4">
               <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700">Dados informados para a festa</h3>
               <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
