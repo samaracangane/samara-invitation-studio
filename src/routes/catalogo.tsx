@@ -23,9 +23,11 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 function Catalogo() {
-  const { categoria } = Route.useSearch();
+  const { categoria, busca } = Route.useSearch();
   const [cat, setCat] = useState<string>(categoria ?? "Todos");
-  const [search, setSearch] = useState("");
+  useEffect(() => { setCat(categoria ?? "Todos"); }, [categoria]);
+  useEffect(() => { setSearch(busca ?? ""); }, [busca]);
+  const [search, setSearch] = useState(busca ?? "");
   const [catalogInvites, setCatalogInvites] = useState<Invite[]>([]);
 
   useEffect(() => {
