@@ -83,16 +83,6 @@ function Home() {
         <div className="absolute bottom-0 left-0 h-3 w-full bg-gradient-to-r from-[#ffe36e] via-[#ffb1d1] to-[#5de0d4]" />
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-12">
-        <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {CATEGORIES.map((category, index) => <Link key={category} to="/catalogo" className="group flex min-h-[156px] flex-col items-center justify-center gap-3 rounded-3xl border border-[#f2dce9] bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#e75a9d] hover:shadow-lg">
-            <span className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl text-4xl shadow-sm transition group-hover:scale-105 ${["bg-[#ffe1ed]","bg-[#e2f7ff]","bg-[#fff0ce]","bg-[#eee3ff]"][index % 4]}`}>{categoryImages[category] ? <img src={categoryImages[category]} alt={category} className="h-full w-full object-cover"/> : ({"Mickey":"🐭","Minnie":"🎀","Bluey":"🐶","Alice":"🐇","Dos Rosa":"💗","Guerreiras K-Pop":"🎤","Desenhos Animados":"🎨","Princesas":"👑","Super Herói":"🦸","Fundo do Mar":"🧜‍♀️","Dinossauro":"🦕","Toy Story":"🚀","Barbie":"💖","Hello Kitty":"🎀","Fazendinha":"🐮","Circo":"🎪","Safari":"🦁","Jardim Encantado":"🦋","365 Sorrisos":"🌈","Patrulha Canina":"🐾"})[category]}</span>
-            <span className="text-sm font-bold text-[#60475f]">{category}</span>
-          </Link>)}
-        </div>
-      </section>
-
       <section className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-5 pb-12 sm:grid-cols-2">
         <div className="group relative min-h-[280px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#ffdfeb] via-[#ffd0e3] to-[#c9b5ff] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
           <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/35 blur-2xl" />
@@ -135,6 +125,16 @@ function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {CATEGORIES.map((category, index) => <Link key={category} to="/catalogo" className="group flex min-h-[156px] flex-col items-center justify-center gap-3 rounded-3xl border border-[#f2dce9] bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#e75a9d] hover:shadow-lg">
+            <span className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl text-4xl shadow-sm transition group-hover:scale-105 ${["bg-[#ffe1ed]","bg-[#e2f7ff]","bg-[#fff0ce]","bg-[#eee3ff]"][index % 4]}`}>{categoryImages[category] ? <img src={categoryImages[category]} alt={category} className="h-full w-full object-cover"/> : ({"Mickey":"🐭","Minnie":"🎀","Bluey":"🐶","Alice":"🐇","Dos Rosa":"💗","Guerreiras K-Pop":"🎤","Desenhos Animados":"🎨","Princesas":"👑","Super Herói":"🦸","Fundo do Mar":"🧜‍♀️","Dinossauro":"🦕","Toy Story":"🚀","Barbie":"💖","Hello Kitty":"🎀","Fazendinha":"🐮","Circo":"🎪","Safari":"🦁","Jardim Encantado":"🦋","365 Sorrisos":"🌈","Patrulha Canina":"🐾"})[category]}</span>
+            <span className="text-sm font-bold text-[#60475f]">{category}</span>
+          </Link>)}
         </div>
       </section>
 
