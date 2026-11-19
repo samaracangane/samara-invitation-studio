@@ -64,13 +64,13 @@ function Home() {
             <div className="absolute right-3 top-3 flex h-16 w-16 rotate-12 items-center justify-center rounded-2xl bg-[#ffe36e] text-[#71317b] shadow-xl"><PartyPopper className="h-8 w-8" /></div>
             <div className="absolute bottom-5 left-0 flex h-14 w-14 -rotate-12 items-center justify-center rounded-full bg-[#58d9d0] text-[#54205e] shadow-xl"><Sparkles className="h-7 w-7" /></div>
             <div className="relative w-[78%] rotate-[-5deg] rounded-[2rem] border-[8px] border-white/90 bg-white p-3 shadow-2xl">
-              <div className="overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#ffb4d2] via-[#ffe7a2] to-[#b7f3e9] px-5 py-12 text-center text-[#66315f]">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/75"><Sparkles className="h-7 w-7 text-[#d92d83]" /></div>
-                <p className="mt-5 font-script text-3xl">Você está convidado!</p>
+              <div className="overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#8ee6f4] via-[#c7f3ff] to-[#ffe69a] px-5 py-9 text-center text-[#174f79]">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/80 bg-[#42b9df] text-6xl shadow-lg">🐶</div>
+                <p className="mt-4 font-display text-2xl font-extrabold tracking-wide text-[#176ca0]">BLUEY</p>
+                <p className="mt-2 font-script text-3xl">Você está convidado!</p>
                 <p className="mt-2 font-display text-4xl font-bold leading-tight">VAMOS<br/>COMEMORAR?</p>
-                <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#e85b9c]" />
-                <p className="mt-4 text-xs font-bold uppercase tracking-[.22em]">Um dia especial merece</p>
-                <p className="mt-1 text-lg font-extrabold">um convite especial!</p>
+                <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#239ac8]" />
+                <p className="mt-4 text-xs font-bold uppercase tracking-[.22em]">Uma aventura divertida</p>
               </div>
             </div>
             <div className="absolute bottom-9 right-0 w-[31%] rotate-[8deg] rounded-2xl border-4 border-white bg-gradient-to-br from-[#fff1a8] to-[#ff8bb8] p-3 text-center text-[#69315e] shadow-2xl">
@@ -81,51 +81,6 @@ function Home() {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 h-3 w-full bg-gradient-to-r from-[#ffe36e] via-[#ffb1d1] to-[#5de0d4]" />
-      </section>
-
-      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-5 pb-12 sm:grid-cols-2">
-        <div className="group relative min-h-[280px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#ffdfeb] via-[#ffd0e3] to-[#c9b5ff] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-          <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/35 blur-2xl" />
-          <div className="relative flex h-full min-h-[230px] items-center justify-between gap-3">
-            <div className="z-10 max-w-[48%]">
-              <p className="font-script text-2xl text-[#a52b78]">Surpreenda!</p>
-              <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-[#54205e]">Seu convite na palma da mão</h2>
-              <p className="mt-3 text-sm font-medium text-[#70466f]">Digital, prático e cheio de encanto.</p>
-              <Link to="/catalogo" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#a52be2] px-4 py-2.5 text-xs font-extrabold text-white shadow-md">Ver convites <ArrowRight className="h-4 w-4"/></Link>
-            </div>
-            <div className="relative mr-2 w-[43%] max-w-[180px] rotate-3 rounded-[2rem] border-[7px] border-[#34243c] bg-[#34243c] p-1.5 shadow-2xl">
-              <div className="absolute left-1/2 top-1 z-10 h-3 w-12 -translate-x-1/2 rounded-full bg-[#34243c]" />
-              <div className="overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#fff4b8] via-[#ffb9d5] to-[#b5f1e6] px-2 py-9 text-center text-[#69315e]">
-                <Sparkles className="mx-auto h-6 w-6 text-[#d92d83]"/>
-                <p className="mt-3 font-script text-lg">Você está convidado!</p>
-                <p className="mt-2 font-display text-xl font-extrabold leading-tight">VAMOS<br/>CELEBRAR</p>
-                <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-[#e85b9c]"/>
-                <p className="mt-3 text-[8px] font-bold uppercase tracking-wider">Um dia especial</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="group relative min-h-[280px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#fff0bb] via-[#ffd9b6] to-[#ffb8d2] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-          <div className="absolute -left-10 -bottom-10 h-44 w-44 rounded-full bg-white/40 blur-2xl" />
-          <div className="relative flex h-full min-h-[230px] items-center justify-between gap-3">
-            <div className="z-10 max-w-[48%]">
-              <p className="font-script text-2xl text-[#bd5c83]">Momentos únicos</p>
-              <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-[#713d61]">Um convite inesquecível</h2>
-              <p className="mt-3 text-sm font-medium text-[#80566c]">Escolha um modelo especial para sua festa.</p>
-              <Link to="/catalogo" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#e85b91] px-4 py-2.5 text-xs font-extrabold text-white shadow-md">Conhecer modelos <ArrowRight className="h-4 w-4"/></Link>
-            </div>
-            <div className="relative mr-1 w-[43%] max-w-[180px] rotate-[-4deg] rounded-[1.4rem] border-[5px] border-white bg-white p-2 text-center text-[#75405e] shadow-2xl">
-              <div className="overflow-hidden rounded-[.9rem] bg-gradient-to-br from-[#fff8d9] via-[#ffd4e5] to-[#d9d0ff] px-2 py-7">
-                <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/80"><Heart className="h-5 w-5 fill-[#e85b91] text-[#e85b91]"/></div>
-                <p className="mt-3 font-script text-lg">Com carinho,</p>
-                <p className="mt-1 font-display text-xl font-extrabold leading-tight">VOCÊ É<br/>NOSSO CONVIDADO!</p>
-                <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-[#e85b91]"/>
-                <p className="mt-3 text-[8px] font-bold uppercase tracking-wider">Uma data para celebrar</p>
-                <Sparkles className="mx-auto mt-2 h-4 w-4 text-[#c77b28]"/>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-12">
