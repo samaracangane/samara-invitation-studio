@@ -81,6 +81,8 @@ function Home() {
         <div className="absolute bottom-0 left-0 h-3 w-full bg-gradient-to-r from-[#ffe36e] via-[#ffb1d1] to-[#5de0d4]" />
       </section>
 
+      <section className="mx-auto max-w-6xl px-5 pt-10"><form onSubmit={(event) => { event.preventDefault(); window.location.href = "/catalogo?busca=" + encodeURIComponent(homeSearch.trim()); }} className="mx-auto flex max-w-2xl items-center gap-3 rounded-full border border-[#efd9e8] bg-white p-2 pl-5 shadow-md"><Search className="h-5 w-5 shrink-0 text-primary"/><input value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Pesquise por convite, tema ou personagem..." aria-label="Pesquisar convites" className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none"/><button type="submit" className="rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">Buscar</button></form></section>
+
       <section className="mx-auto max-w-6xl px-5 py-12">
         <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -91,6 +93,7 @@ function Home() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-5 py-12"><div className="mb-7"><p className="font-script text-3xl text-primary">Novidades chegando</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Lançamentos</h2></div>{launchInvites.length > 0 ? <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{launchInvites.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <p className="rounded-2xl border border-dashed border-primary/30 bg-white p-5 text-center text-sm text-muted-foreground">Novos lançamentos aparecerão aqui em breve.</p>}</section>
       <section className="mx-auto max-w-6xl px-5 py-12">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><p className="font-script text-3xl text-primary">Escolha seu favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Convites em destaque</h2><p className="mt-2 text-sm text-muted-foreground">Veja os modelos disponíveis e escolha o que combina com sua festa.</p></div><Link to="/catalogo" className="text-sm font-bold text-primary hover:underline">Ver todos os convites →</Link></div>
         {featuredInvites.length > 0 ? <div className="mb-12 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{featuredInvites.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <div className="mb-12 rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-muted-foreground">Novos convites estarão disponíveis aqui em breve.</div> }
