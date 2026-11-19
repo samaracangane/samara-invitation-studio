@@ -84,8 +84,6 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-12">
-        <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><p className="font-script text-3xl text-primary">Escolha seu favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Convites em destaque</h2><p className="mt-2 text-sm text-muted-foreground">Veja os modelos disponíveis e escolha o que combina com sua festa.</p></div><Link to="/catalogo" className="text-sm font-bold text-primary hover:underline">Ver todos os convites →</Link></div>
-        {featuredInvites.length > 0 ? <div className="mb-12 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{featuredInvites.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <div className="mb-12 rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-muted-foreground">Novos convites estarão disponíveis aqui em breve.</div> }
         <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {CATEGORIES.map((category, index) => <Link key={category} to="/catalogo" className="group flex min-h-[156px] flex-col items-center justify-center gap-3 rounded-3xl border border-[#f2dce9] bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#e75a9d] hover:shadow-lg">
@@ -93,6 +91,57 @@ function Home() {
             <span className="text-sm font-bold text-[#60475f]">{category}</span>
           </Link>)}
         </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-5 pb-12 sm:grid-cols-2">
+        <div className="group relative min-h-[280px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#ffdfeb] via-[#ffd0e3] to-[#c9b5ff] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+          <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/35 blur-2xl" />
+          <div className="relative flex h-full min-h-[230px] items-center justify-between gap-3">
+            <div className="z-10 max-w-[48%]">
+              <p className="font-script text-2xl text-[#a52b78]">Surpreenda!</p>
+              <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-[#54205e]">Seu convite na palma da mão</h2>
+              <p className="mt-3 text-sm font-medium text-[#70466f]">Digital, prático e cheio de encanto.</p>
+              <Link to="/catalogo" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#a52be2] px-4 py-2.5 text-xs font-extrabold text-white shadow-md">Ver convites <ArrowRight className="h-4 w-4"/></Link>
+            </div>
+            <div className="relative mr-2 w-[43%] max-w-[180px] rotate-3 rounded-[2rem] border-[7px] border-[#34243c] bg-[#34243c] p-1.5 shadow-2xl">
+              <div className="absolute left-1/2 top-1 z-10 h-3 w-12 -translate-x-1/2 rounded-full bg-[#34243c]" />
+              <div className="overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#fff4b8] via-[#ffb9d5] to-[#b5f1e6] px-2 py-9 text-center text-[#69315e]">
+                <Sparkles className="mx-auto h-6 w-6 text-[#d92d83]"/>
+                <p className="mt-3 font-script text-lg">Você está convidado!</p>
+                <p className="mt-2 font-display text-xl font-extrabold leading-tight">VAMOS<br/>CELEBRAR</p>
+                <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-[#e85b9c]"/>
+                <p className="mt-3 text-[8px] font-bold uppercase tracking-wider">Um dia especial</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="group relative min-h-[280px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#fff0bb] via-[#ffd9b6] to-[#ffb8d2] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+          <div className="absolute -left-10 -bottom-10 h-44 w-44 rounded-full bg-white/40 blur-2xl" />
+          <div className="relative flex h-full min-h-[230px] items-center justify-between gap-3">
+            <div className="z-10 max-w-[48%]">
+              <p className="font-script text-2xl text-[#bd5c83]">Momentos únicos</p>
+              <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-[#713d61]">Um convite inesquecível</h2>
+              <p className="mt-3 text-sm font-medium text-[#80566c]">Escolha um modelo especial para sua festa.</p>
+              <Link to="/catalogo" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#e85b91] px-4 py-2.5 text-xs font-extrabold text-white shadow-md">Conhecer modelos <ArrowRight className="h-4 w-4"/></Link>
+            </div>
+            <div className="relative mr-1 w-[43%] max-w-[180px] rotate-[-4deg] rounded-[1.4rem] border-[5px] border-white bg-white p-2 text-center text-[#75405e] shadow-2xl">
+              <div className="overflow-hidden rounded-[.9rem] bg-gradient-to-br from-[#fff8d9] via-[#ffd4e5] to-[#d9d0ff] px-2 py-7">
+                <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/80"><Heart className="h-5 w-5 fill-[#e85b91] text-[#e85b91]"/></div>
+                <p className="mt-3 font-script text-lg">Com carinho,</p>
+                <p className="mt-1 font-display text-xl font-extrabold leading-tight">VOCÊ É<br/>NOSSO CONVIDADO!</p>
+                <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-[#e85b91]"/>
+                <p className="mt-3 text-[8px] font-bold uppercase tracking-wider">Uma data para celebrar</p>
+                <Sparkles className="mx-auto mt-2 h-4 w-4 text-[#c77b28]"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-3"><div><p className="font-script text-3xl text-primary">Escolha seu favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Convites em destaque</h2><p className="mt-2 text-sm text-muted-foreground">Veja os modelos disponíveis e escolha o que combina com sua festa.</p></div><Link to="/catalogo" className="text-sm font-bold text-primary hover:underline">Ver todos os convites →</Link></div>
+        {featuredInvites.length > 0 ? <div className="mb-12 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{featuredInvites.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <div className="mb-12 rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-muted-foreground">Novos convites estarão disponíveis aqui em breve.</div> }
+
       </section>
 
       <section className="mx-5 mb-16 overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#ff397d] via-[#a52be2] to-[#ff8a28] text-white shadow-xl md:mx-auto md:max-w-6xl">
