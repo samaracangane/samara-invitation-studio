@@ -107,17 +107,26 @@ function AdminPage() {
 
   async function uploadFile(file: File, kind: "image" | "video") {
     if (!supabase || !session?.user) return;
+    if (kind === "video" && !file.type.startsWith("video/") && !/\.(mp4|webm|mov|m4v|3gp)$/i.test(file.name)) {
+      setMessage("Selecione um arquivo de vídeo (MP4, MOV ou WebM).");
+      return;
+    }
+    setMessage(kind === "video" ? "Enviando vídeo..." : "Enviando imagem...");
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
     const path = `${session.user.id}/${Date.now()}-${safeName}`;
-    const { error } = await supabase.storage.from("invite-media").upload(path, file, { upsert: true });
-    if (error) { setMessage(error.message); return; }
-    const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
-    if (kind === "image") {
-      setDraft((current) => ({ ...current, image_url: current.image_url || data.publicUrl, image_urls: [...(current.image_urls || []), data.publicUrl] }));
-      setMessage("Imagem adicionada. Você pode enviar outras fotos.");
-    } else {
-      setDraft((current) => ({ ...current, video_url: data.publicUrl }));
-      setMessage("Vídeo enviado com sucesso.");
+    try {
+      const { error } = await supabase.storage.from("invite-media").upload(path, file, { upsert: true });
+      if (error) { setMessage(`Não foi possível enviar o arquivo: ${error.message}`); return; }
+      const { data } = supabase.storage.from("invite-media").getPublicUrl(path);
+      if (kind === "image") {
+        setDraft((current) => ({ ...current, image_url: current.image_url || data.publicUrl, image_urls: [...(current.image_urls || []), data.publicUrl] }));
+        setMessage("Imagem adicionada. Você pode enviar outras fotos.");
+      } else {
+        setDraft((current) => ({ ...current, video_url: data.publicUrl }));
+        setMessage("Vídeo enviado com sucesso. Agora salve o convite.");
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Erro inesperado ao enviar o arquivo.");
     }
   }
 
@@ -289,7 +298,7 @@ function AdminPage() {
               </div>
               <label className="block text-sm font-medium text-slate-700">Descrição<textarea value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} rows={3} placeholder="Conte um pouco sobre este modelo..." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400"/></label>
               <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><FileImage size={17} className="text-violet-600"/> Fotos do convite (pode selecionar várias)</span><input type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{const files=Array.from(e.target.files || []); files.forEach(file=>void uploadFile(file,"image")); e.currentTarget.value="";}} className="mt-2 block w-full text-xs"/></label>
-              <label className="block rounded-xl border border-dashed border-pink-200 bg-pink-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-pink-600"/> Vídeo (opcional)</span><input type="file" accept="video/mp4,video/webm" onChange={e=>e.target.files?.[0] && void uploadFile(e.target.files[0],"video")} className="mt-2 block w-full text-xs"/></label>
+              <label className="block rounded-xl border border-dashed border-pink-200 bg-pink-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-pink-600"/> Vídeo (opcional)</span><input type="file" accept="video/*,.mp4,.mov,.webm,.m4v,.3gp" onChange={e=>{const file=e.currentTarget.files?.[0]; e.currentTarget.value=""; if(file) void uploadFile(file,"video");}} className="mt-2 block w-full text-xs"/></label>
               {draft.image_urls.length > 0 && <div className="grid grid-cols-3 gap-2">{draft.image_urls.map((url,index)=><div key={url} className="relative"><img src={url} alt={`Prévia ${index+1} do convite`} className="h-28 w-full rounded-xl border object-cover"/><button type="button" onClick={()=>setDraft(current=>({...current,image_urls:current.image_urls.filter(item=>item!==url),image_url:current.image_urls.filter(item=>item!==url)[0] || ""}))} className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-1 text-xs text-rose-600 shadow">Remover</button></div>)}</div>}
               {draft.video_url && <p className="text-xs text-emerald-700">Vídeo anexado com sucesso.</p>}
               <label className="flex items-center gap-3 rounded-xl bg-violet-50 p-3 text-sm"><input type="checkbox" checked={draft.is_featured} onChange={e=>setDraft({...draft,is_featured:e.target.checked})} className="h-4 w-4 accent-violet-600"/> Mostrar na seção de destaques</label><label className="flex items-center gap-3 rounded-xl bg-pink-50 p-3 text-sm"><input type="checkbox" checked={draft.is_new} onChange={e=>setDraft({...draft,is_new:e.target.checked})} className="h-4 w-4 accent-pink-600"/> Mostrar na seção de lançamentos</label><label className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input type="checkbox" checked={draft.is_active} onChange={e=>setDraft({...draft,is_active:e.target.checked})} className="h-4 w-4 accent-violet-600"/> Exibir este convite na loja</label>
