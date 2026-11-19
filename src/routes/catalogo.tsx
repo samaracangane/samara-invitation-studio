@@ -7,6 +7,7 @@ import { mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/catalogo")({
+  validateSearch: (search: Record<string, unknown>) => ({ categoria: typeof search.categoria === "string" ? search.categoria : undefined }),
   head: () => ({
     meta: [
       { title: "Catálogo de Convites — Samara’s Enchanted Invite" },
@@ -19,7 +20,8 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 function Catalogo() {
-  const [cat, setCat] = useState<string>("Todos");
+  const { categoria } = Route.useSearch();
+  const [cat, setCat] = useState<string>(categoria ?? "Todos");
   const [search, setSearch] = useState("");
   const [catalogInvites, setCatalogInvites] = useState<Invite[]>([]);
 
@@ -65,7 +67,7 @@ function Catalogo() {
           
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          {["Todos", "Animados"].map((category) => <button key={category} type="button" onClick={() => setCat(category)} aria-pressed={cat === category} className={`rounded-full border px-5 py-2.5 text-sm font-medium transition-all ${cat === category ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-secondary/60"}`}>{category}</button>)}
+          {["Todos", "Animados", ...(cat !== "Todos" && cat !== "Animados" ? [cat] : [])].map((category) => <button key={category} type="button" onClick={() => setCat(category)} aria-pressed={cat === category} className={`rounded-full border px-5 py-2.5 text-sm font-medium transition-all ${cat === category ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-secondary/60"}`}>{category}</button>)}
         </div>
         {list.length > 0 ? <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">{list.map((invite) => <InviteCard key={invite.id} invite={invite}/>)}</div> : <div className="mt-10 rounded-3xl border border-dashed border-primary/30 bg-card px-6 py-16 text-center"><Search className="mx-auto h-9 w-9 text-primary/60" aria-hidden="true"/><h2 className="mt-4 font-display text-2xl font-semibold">Nenhum convite encontrado</h2><p className="mt-2 text-sm text-muted-foreground">Tente outro termo ou escolha uma categoria diferente.</p><button type="button" onClick={() => { setSearch(""); setCat("Todos"); }} className="mt-5 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Ver todos os convites</button></div>}
       </div>
