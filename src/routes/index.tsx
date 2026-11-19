@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { InviteCard } from "@/components/InviteCard";
 import { mapSupabaseInvite, type Invite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
-import { ArrowRight, Heart, ShieldCheck, Sparkles, WandSparkles, Star, PartyPopper } from "lucide-react";
+import { ArrowRight, Heart, ShieldCheck, Sparkles, WandSparkles, Star, PartyPopper, Search } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CATEGORIES } from "@/data/invites";
 import blueyInvite from "@/assets/convite-bluey-helena.jpg.asset.json";
@@ -22,13 +22,15 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const [featuredInvites, setFeaturedInvites] = useState<Invite[]>([]);
+  const [launchInvites, setLaunchInvites] = useState<Invite[]>([]);
+  const [homeSearch, setHomeSearch] = useState("");
   const [categoryImages, setCategoryImages] = useState<Record<string, string>>({});
   useEffect(() => {
     let alive = true;
     async function load() {
       if (!supabase) return;
-      const { data } = await supabase.from("invites").select("slug,name,category,description,price,image_url,image_urls,video_url,fields").eq("is_active", true).order("created_at", { ascending: false }).limit(8);
-      if (alive && data) setFeaturedInvites(data.map((row) => mapSupabaseInvite(row)));
+      const { data } = await supabase.from("invites").select("slug,name,category,description,price,image_url,image_urls,video_url,fields,is_featured,is_new").eq("is_active", true).order("created_at", { ascending: false }).limit(8);
+      if (alive && data) { setFeaturedInvites(data.filter((row) => row.is_featured).map((row) => mapSupabaseInvite(row))); setLaunchInvites(data.filter((row) => row.is_new).map((row) => mapSupabaseInvite(row))); }
       const { data: categoryData } = await supabase.from("category_media").select("category,image_url");
       if (alive && categoryData) setCategoryImages(Object.fromEntries(categoryData.map((row) => [row.category, row.image_url])));
     }
