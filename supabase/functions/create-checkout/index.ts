@@ -46,7 +46,7 @@ Deno.serve(async (request) => {
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
     const { data: invite, error: inviteError } = await supabase
       .from("invites")
-      .select("slug,name,price,is_active")
+      .select("slug,name,price,is_active,image_url")
       .eq("slug", inviteSlug)
       .eq("is_active", true)
       .maybeSingle();
@@ -74,6 +74,7 @@ Deno.serve(async (request) => {
       .insert({
         invite_id: invite.slug,
         invite_name: invite.name,
+        invite_image_url: invite.image_url ?? null,
         amount_cents: amountCents,
         currency: "BRL",
         customer_email: email,
