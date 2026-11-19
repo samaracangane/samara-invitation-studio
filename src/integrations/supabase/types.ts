@@ -90,6 +90,8 @@ export type Database = {
           image_url: string | null
           image_urls: string[]
           is_active: boolean
+          is_featured: boolean
+          is_new: boolean
           name: string
           price: number
           slug: string
@@ -106,6 +108,8 @@ export type Database = {
           image_url?: string | null
           image_urls?: string[]
           is_active?: boolean
+          is_featured?: boolean
+          is_new?: boolean
           name: string
           price?: number
           slug: string
@@ -122,6 +126,8 @@ export type Database = {
           image_url?: string | null
           image_urls?: string[]
           is_active?: boolean
+          is_featured?: boolean
+          is_new?: boolean
           name?: string
           price?: number
           slug?: string
