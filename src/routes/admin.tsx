@@ -218,7 +218,7 @@ function AdminPage() {
             <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-violet-100 bg-white px-4 py-3 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"/>
           </label>
           <button className="w-full rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-5 py-3.5 font-semibold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5">Entrar no painel</button>
-          <button type="button" onClick={sendLoginLink} className="w-full rounded-xl border border-violet-200 px-5 py-3 text-sm font-medium text-violet-700 transition hover:bg-violet-50">Primeiro acesso? Enviar link para cadastrar a senha</button>
+          <button type="button" onClick={sendLoginLink} className="w-full rounded-xl border border-violet-200 px-5 py-3 text-sm font-medium text-violet-700 transition hover:bg-violet-50">Entrar temporariamente com link por e-mail</button>
           {message && <p role="status" className="rounded-xl bg-violet-50 p-3 text-sm text-violet-700">{message}</p>}
         </form>
         <a href="/" className="mt-7 inline-flex text-sm font-medium text-violet-700 hover:text-fuchsia-600">← Voltar para a loja</a>
