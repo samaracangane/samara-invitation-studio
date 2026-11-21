@@ -34,6 +34,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const [email, setEmail] = useState("samaracangane6@gmail.com");
+  const [password, setPassword] = useState("");
   const [session, setSession] = useState<any>(null);
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -93,6 +94,17 @@ function AdminPage() {
   const filteredRows = useMemo(() => rows.filter((row) =>
     (row.name + " " + row.category).toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))
   ), [rows, query]);
+
+  async function signInWithPassword(event: FormEvent) {
+    event.preventDefault();
+    if (!supabase) return;
+    setMessage("Entrando no painel...");
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    setMessage(error ? "Não foi possível entrar. Confira o e-mail e a senha. Se ainda não cadastrou uma senha, use o link de primeiro acesso." : "");
+  }
 
   async function sendLoginLink(event: FormEvent) {
     event.preventDefault();
@@ -197,12 +209,16 @@ function AdminPage() {
         <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-lg"><Crown size={28}/></div>
         <p className="text-xs font-semibold uppercase tracking-[.24em] text-violet-500">Painel de gestão</p>
         <h1 className="mt-2 font-display text-4xl text-[#302342]">Acesso administrativo</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-500">Entre com seu e-mail autorizado para gerenciar seu catálogo de convites.</p>
-        <form onSubmit={sendLoginLink} className="mt-7 space-y-4">
+        <p className="mt-3 text-sm leading-6 text-slate-500">Entre com seu e-mail e senha para acessar o painel sem precisar abrir o e-mail a cada entrada.</p>
+        <form onSubmit={signInWithPassword} className="mt-7 space-y-4">
           <label className="block text-sm font-medium text-slate-700">E-mail de acesso
             <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-violet-100 bg-white px-4 py-3 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"/>
           </label>
-          <button className="w-full rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-5 py-3.5 font-semibold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5">Enviar link de acesso</button>
+          <label className="block text-sm font-medium text-slate-700">Senha
+            <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-violet-100 bg-white px-4 py-3 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"/>
+          </label>
+          <button className="w-full rounded-xl bg-gradient-to-r from-violet-700 to-fuchsia-600 px-5 py-3.5 font-semibold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5">Entrar no painel</button>
+          <button type="button" onClick={sendLoginLink} className="w-full rounded-xl border border-violet-200 px-5 py-3 text-sm font-medium text-violet-700 transition hover:bg-violet-50">Primeiro acesso? Enviar link para cadastrar a senha</button>
           {message && <p role="status" className="rounded-xl bg-violet-50 p-3 text-sm text-violet-700">{message}</p>}
         </form>
         <a href="/" className="mt-7 inline-flex text-sm font-medium text-violet-700 hover:text-fuchsia-600">← Voltar para a loja</a>
