@@ -29,10 +29,16 @@ function Home() {
     let alive = true;
     async function load() {
       if (!supabase) return;
-      const { data } = await supabase.from("invites").select("slug,name,category,description,price,image_url,image_urls,video_url,fields,is_featured,is_new").eq("is_active", true).order("created_at", { ascending: false });
-      if (alive && data) { setFeaturedInvites(data.filter((row) => row.is_featured).map((row) => mapSupabaseInvite(row))); setLaunchInvites(data.filter((row) => row.is_new).map((row) => mapSupabaseInvite(row))); }
-      const { data: categoryData } = await supabase.from("category_media").select("category,image_url");
-      if (alive && categoryData) setCategoryImages(Object.fromEntries(categoryData.map((row) => [row.category, row.image_url])));
+      const inviteFields = "slug,name,category,description,price,image_url,image_urls,video_url,fields";
+      const [featuredResult, launchResult, categoryResult] = await Promise.all([
+        supabase.from("invites").select(inviteFields).eq("is_active", true).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
+        supabase.from("invites").select(inviteFields).eq("is_active", true).eq("is_new", true).order("created_at", { ascending: false }).limit(8),
+        supabase.from("category_media").select("category,image_url"),
+      ]);
+      if (!alive) return;
+      if (featuredResult.data) setFeaturedInvites(featuredResult.data.map((row) => mapSupabaseInvite(row)));
+      if (launchResult.data) setLaunchInvites(launchResult.data.map((row) => mapSupabaseInvite(row)));
+      if (categoryResult.data) setCategoryImages(Object.fromEntries(categoryResult.data.map((row) => [row.category, row.image_url])));
     }
     void load();
     return () => { alive = false; };
@@ -87,7 +93,7 @@ function Home() {
         <div className="mb-7 text-center"><p className="font-script text-3xl text-primary">Encontre seu tema favorito</p><h2 className="mt-1 font-display text-3xl font-bold text-foreground md:text-4xl">Categorias encantadoras</h2><p className="mt-2 text-sm text-muted-foreground">Um convite especial para cada tipo de comemoração.</p></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {CATEGORIES.map((category, index) => <Link key={category} to="/catalogo" search={{ categoria: category }} className="group flex min-h-[156px] flex-col items-center justify-center gap-3 rounded-3xl border border-[#f2dce9] bg-white px-3 py-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#e75a9d] hover:shadow-lg">
-            <span className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl text-4xl shadow-sm transition group-hover:scale-105 ${["bg-[#ffe1ed]","bg-[#e2f7ff]","bg-[#fff0ce]","bg-[#eee3ff]"][index % 4]}`}>{categoryImages[category] ? <img src={categoryImages[category]} alt={category} className="h-full w-full object-cover"/> : ({"Mickey":"🐭","Minnie":"🎀","Bluey":"🐶","Alice":"🐇","Dos Rosa":"💗","Guerreiras K-Pop":"🎤","Desenhos Animados":"🎨","Princesas":"👑","Super Herói":"🦸","Fundo do Mar":"🧜‍♀️","Dinossauro":"🦕","Toy Story":"🚀","Barbie":"💖","Hello Kitty":"🎀","Fazendinha":"🐮","Circo":"🎪","Safari":"🦁","Jardim Encantado":"🦋","365 Sorrisos":"🌈","Patrulha Canina":"🐾"})[category]}</span>
+            <span className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl text-4xl shadow-sm transition group-hover:scale-105 ${["bg-[#ffe1ed]","bg-[#e2f7ff]","bg-[#fff0ce]","bg-[#eee3ff]"][index % 4]}`}>{categoryImages[category] ? <img src={categoryImages[category]} alt={category} loading="lazy" decoding="async" width={80} height={80} className="h-full w-full object-cover"/> : ({"Mickey":"🐭","Minnie":"🎀","Bluey":"🐶","Alice":"🐇","Dos Rosa":"💗","Guerreiras K-Pop":"🎤","Desenhos Animados":"🎨","Princesas":"👑","Super Herói":"🦸","Fundo do Mar":"🧜‍♀️","Dinossauro":"🦕","Toy Story":"🚀","Barbie":"💖","Hello Kitty":"🎀","Fazendinha":"🐮","Circo":"🎪","Safari":"🦁","Jardim Encantado":"🦋","365 Sorrisos":"🌈","Patrulha Canina":"🐾"})[category]}</span>
             <span className="text-sm font-bold text-[#60475f]">{category}</span>
           </Link>)}
         </div>
