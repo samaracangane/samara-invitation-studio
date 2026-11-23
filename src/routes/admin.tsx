@@ -46,6 +46,12 @@ function AdminPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoryPhoto, setCategoryPhoto] = useState<string>(CATEGORY_OPTIONS[0]);
   const [categoryPhotoUrls, setCategoryPhotoUrls] = useState<Record<string, string>>({});
+  const [aiTheme, setAiTheme] = useState("");
+  const [aiOccasion, setAiOccasion] = useState("Aniversário");
+  const [aiAge, setAiAge] = useState("");
+  const [aiColors, setAiColors] = useState("");
+  const [aiDetails, setAiDetails] = useState("");
+  const [generatingDescription, setGeneratingDescription] = useState(false);
 
   useEffect(() => {
     if (!supabase) { setChecking(false); return; }
@@ -115,6 +121,32 @@ function AdminPage() {
       options: { emailRedirectTo: window.location.origin + "/admin" },
     });
     setMessage(error ? error.message : "Enviamos um link de acesso para seu e-mail. Abra-o neste dispositivo.");
+  }
+
+  async function generateDescription() {
+    if (!supabase) return;
+    if (!aiTheme.trim() || !aiOccasion.trim()) {
+      setMessage("Informe o tema e a ocasião para gerar a descrição.");
+      return;
+    }
+    setGeneratingDescription(true);
+    setMessage("A IA está criando uma descrição para seu convite...");
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-invite-description", {
+        body: { theme: aiTheme, occasion: aiOccasion, age: aiAge, colors: aiColors, details: aiDetails },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (typeof data?.description !== "string" || !data.description.trim()) {
+        throw new Error("A IA não retornou uma descrição. Tente novamente.");
+      }
+      setDraft((current) => ({ ...current, description: data.description.trim() }));
+      setMessage("Descrição criada! Revise o texto e salve o convite.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível gerar a descrição.");
+    } finally {
+      setGeneratingDescription(false);
+    }
   }
 
   async function uploadFile(file: File, kind: "image" | "video") {
@@ -315,6 +347,30 @@ function AdminPage() {
                 <label className="block text-sm font-medium text-slate-700">Preço (R$)<input required type="number" min="0" step="0.01" value={draft.price} onChange={e=>setDraft({...draft,price:e.target.value})} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"/></label>
               </div>
               <label className="block text-sm font-medium text-slate-700">Descrição<textarea value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})} rows={3} placeholder="Conte um pouco sobre este modelo..." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3 outline-none focus:border-violet-400"/></label>
+              <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-pink-50 p-4">
+                <div className="flex items-center gap-2"><Sparkles size={18} className="text-violet-600"/><p className="text-sm font-semibold text-violet-900">Criar descrição com IA</p></div>
+                <p className="mt-1 text-xs leading-5 text-violet-700">Informe os detalhes do convite. A IA cria um texto comercial para você revisar antes de salvar.</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <label className="block text-xs font-medium text-slate-700">Tema / personagem
+                    <input value={aiTheme} onChange={e=>setAiTheme(e.target.value)} placeholder="Ex.: Jardim Encantado" maxLength={120} className="mt-1 w-full rounded-lg border border-violet-100 bg-white px-3 py-2.5 text-sm"/>
+                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Ocasião
+                    <input value={aiOccasion} onChange={e=>setAiOccasion(e.target.value)} placeholder="Ex.: aniversário infantil" maxLength={80} className="mt-1 w-full rounded-lg border border-violet-100 bg-white px-3 py-2.5 text-sm"/>
+                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Idade (opcional)
+                    <input value={aiAge} onChange={e=>setAiAge(e.target.value)} placeholder="Ex.: 5 anos" maxLength={40} className="mt-1 w-full rounded-lg border border-violet-100 bg-white px-3 py-2.5 text-sm"/>
+                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Cores principais (opcional)
+                    <input value={aiColors} onChange={e=>setAiColors(e.target.value)} placeholder="Ex.: rosa, lilás e dourado" maxLength={120} className="mt-1 w-full rounded-lg border border-violet-100 bg-white px-3 py-2.5 text-sm"/>
+                  </label>
+                </div>
+                <label className="mt-3 block text-xs font-medium text-slate-700">Detalhes confirmados do convite (opcional)
+                  <textarea value={aiDetails} onChange={e=>setAiDetails(e.target.value)} rows={2} maxLength={500} placeholder="Ex.: convite digital animado; informar somente o que realmente está incluído." className="mt-1 w-full rounded-lg border border-violet-100 bg-white px-3 py-2.5 text-sm"/>
+                </label>
+                <button type="button" disabled={generatingDescription} onClick={()=>void generateDescription()} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-800 disabled:cursor-wait disabled:opacity-60">
+                  <Sparkles size={16}/>{generatingDescription ? "Criando descrição..." : "Gerar descrição com IA"}
+                </button>
+              </div>
               <label className="block rounded-xl border border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><FileImage size={17} className="text-violet-600"/> Fotos do convite (pode selecionar várias)</span><input type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{const files=Array.from(e.target.files || []); files.forEach(file=>void uploadFile(file,"image")); e.currentTarget.value="";}} className="mt-2 block w-full text-xs"/></label>
               <label className="block rounded-xl border border-dashed border-pink-200 bg-pink-50/50 p-4 text-sm font-medium text-slate-700"><span className="flex items-center gap-2"><Upload size={17} className="text-pink-600"/> Vídeo (opcional)</span><input type="file" accept="video/*,.mp4,.mov,.webm,.m4v,.3gp" onChange={e=>{const file=e.currentTarget.files?.[0]; e.currentTarget.value=""; if(file) void uploadFile(file,"video");}} className="mt-2 block w-full text-xs"/></label>
               {draft.image_urls.length > 0 && <div className="grid grid-cols-3 gap-2">{draft.image_urls.map((url,index)=><div key={url} className="relative"><img src={url} alt={`Prévia ${index+1} do convite`} className="h-28 w-full rounded-xl border object-cover"/><button type="button" onClick={()=>setDraft(current=>({...current,image_urls:current.image_urls.filter(item=>item!==url),image_url:current.image_urls.filter(item=>item!==url)[0] || ""}))} className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-1 text-xs text-rose-600 shadow">Remover</button></div>)}</div>}
