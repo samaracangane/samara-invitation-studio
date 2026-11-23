@@ -68,7 +68,7 @@ function Home() {
             <div className="absolute bottom-5 left-0 flex h-14 w-14 -rotate-12 items-center justify-center rounded-full bg-[#58d9d0] text-[#54205e] shadow-xl"><Sparkles className="h-7 w-7" /></div>
             <div className="relative w-[78%] rotate-[-5deg] rounded-[2rem] border-[8px] border-white/90 bg-white p-3 shadow-2xl">
               <div className="overflow-hidden rounded-[1.35rem] bg-white">
-                <img src={blueyInvite.url} alt="Convite Bluey da Helena, 5 anos — 23/05 às 16h30 no Salão de Festas Doce Infância" className="block h-auto w-full" />
+                <img src={blueyInvite.url} alt="Convite Bluey da Helena, 5 anos — 23/05 às 16h30 no Salão de Festas Doce Infância" fetchPriority="high" decoding="async" className="block h-auto w-full" />
               </div>
             </div>
             <div className="absolute -left-[7%] top-10 w-[31%] -rotate-[8deg] rounded-2xl border-4 border-white bg-gradient-to-br from-[#fff1a8] to-[#ff8bb8] p-3 text-center text-[#69315e] shadow-2xl">

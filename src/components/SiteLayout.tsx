@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ExitIntent } from "./ExitIntent";
 import { useState, type ReactNode } from "react";
 import { Menu, X, Instagram, Sparkles } from "lucide-react";
 import { INSTAGRAM } from "@/data/invites";
@@ -41,6 +42,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         {menuOpen && <nav id="mobile-navigation" aria-label="Navegação móvel" className="border-t border-border bg-background px-4 py-3 shadow-lg sm:hidden"><div className="mx-auto flex max-w-6xl flex-col gap-1">{nav.map((n) => <Link key={n.to} to={n.to} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-sm font-medium transition hover:bg-secondary hover:text-primary" activeProps={{ className: "rounded-xl bg-secondary px-4 py-3 font-semibold text-primary" }} activeOptions={{ exact: true }}>{n.label}</Link>)}</div></nav>}
       </header>
       <main>{children}</main>
+      <ExitIntent />
       <footer className="mt-16 bg-[var(--color-sidebar)] text-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-3">
           <div><div className="inline-flex rounded-xl bg-white px-3 py-2"><Logo/></div><p className="mt-4 max-w-xs text-sm leading-6 text-white/65">Convites personalizados, digitais e animados para celebrar os momentos mais especiais da vida.</p></div>
