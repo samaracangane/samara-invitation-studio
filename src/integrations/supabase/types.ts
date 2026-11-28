@@ -29,6 +29,32 @@ export type Database = {
         }
         Relationships: []
       }
+      asaas_payment_events: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asaas_payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       category_media: {
         Row: {
           category: string
@@ -140,6 +166,7 @@ export type Database = {
         Row: {
           access_token_hash: string | null
           amount_cents: number
+          asaas_customer_id: string | null
           checkout_url: string | null
           created_at: string
           currency: string
@@ -160,6 +187,7 @@ export type Database = {
           invite_name: string
           offer_id: string | null
           paid_at: string | null
+          payment_checked_at: string | null
           payment_provider: string
           payment_status: string
           provider_checkout_id: string | null
@@ -169,6 +197,7 @@ export type Database = {
         Insert: {
           access_token_hash?: string | null
           amount_cents: number
+          asaas_customer_id?: string | null
           checkout_url?: string | null
           created_at?: string
           currency?: string
@@ -189,6 +218,7 @@ export type Database = {
           invite_name: string
           offer_id?: string | null
           paid_at?: string | null
+          payment_checked_at?: string | null
           payment_provider?: string
           payment_status?: string
           provider_checkout_id?: string | null
@@ -198,6 +228,7 @@ export type Database = {
         Update: {
           access_token_hash?: string | null
           amount_cents?: number
+          asaas_customer_id?: string | null
           checkout_url?: string | null
           created_at?: string
           currency?: string
@@ -218,6 +249,7 @@ export type Database = {
           invite_name?: string
           offer_id?: string | null
           paid_at?: string | null
+          payment_checked_at?: string | null
           payment_provider?: string
           payment_status?: string
           provider_checkout_id?: string | null
@@ -307,6 +339,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_asaas_payment: {
+        Args: {
+          p_event_id?: string
+          p_order_id: string
+          p_payment_id: string
+          p_status: string
+        }
+        Returns: boolean
+      }
       can_upload_order_photo: {
         Args: { order_folder: string }
         Returns: boolean
