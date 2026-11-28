@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCanvas } from "@/components/InviteCanvas";
 import { mapSupabaseInvite } from "@/data/invites";
+import { supabase } from "@/lib/supabase";
 import { createAsaasCheckout } from "@/lib/asaas.functions";
 
 export const Route = createFileRoute("/convite/$id")({
@@ -50,11 +51,11 @@ function InviteProduct() {
   const [notice, setNotice] = useState("");
 
   async function startCheckout() {
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerEmail.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
       setNotice("Digite um e-mail válido para localizar seu pedido depois do pagamento.");
       return;
     }
-    if (!/^[0-9]{11}$|^[0-9]{14}$/.test(customerCpfCnpj.replace(/\\D/g, ""))) {
+    if (!/^[0-9]{11}$|^[0-9]{14}$/.test(customerCpfCnpj.replace(/\D/g, ""))) {
       setNotice("Informe um CPF ou CNPJ válido, somente para identificação do pagamento.");
       return;
     }
@@ -62,7 +63,7 @@ function InviteProduct() {
       setNotice("Informe o nome completo de quem está realizando a compra.");
       return;
     }
-    if (!/^\\+?[0-9()\\s-]{10,20}$/.test(customerWhatsapp.trim())) {
+    if (!/^\+?[0-9()\s-]{10,20}$/.test(customerWhatsapp.trim())) {
       setNotice("Informe um WhatsApp válido com DDD.");
       return;
     }
@@ -80,7 +81,7 @@ function InviteProduct() {
           accessToken,
           inviteSlug: invite.id,
           customerName: customerName.trim(),
-          customerCpfCnpj: customerCpfCnpj.replace(/\\D/g, ""),
+          customerCpfCnpj: customerCpfCnpj.replace(/\D/g, ""),
           customerEmail: customerEmail.trim().toLowerCase(),
           customerWhatsapp: customerWhatsapp.trim(),
           eventDetails: {
