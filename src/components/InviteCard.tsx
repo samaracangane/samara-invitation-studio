@@ -16,7 +16,7 @@ export function InviteCard({ invite }: { invite: Invite }) {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             if (!video.src) {
-              const source = video.dataset.src;
+              const source = video.dataset['src'];
               if (source) {
                 video.src = source;
                 video.load();
