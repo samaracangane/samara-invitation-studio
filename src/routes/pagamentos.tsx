@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, CircleAlert, Link2, LogIn, RefreshCw, Save, ToggleLeft, ToggleRight, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, CircleAlert, LogIn, RefreshCw, ShieldCheck, Webhook } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { asaasAdminAction } from "@/lib/asaas.functions";
 
-type Offer = { id: string; price_cents: number; checkout_id: string; checkout_url: string; is_active: boolean };
-type Diagnostics = { webhookTokenConfigured: boolean; serviceRoleConfigured: boolean };
-const money = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+type AsaasStatus = {
+  accountStatus: string;
+  bankStatus: string;
+  webhookActive: boolean;
+};
 
 export const Route = createFileRoute("/pagamentos")({
-  head: () => ({ meta: [{ title: "Pagamentos Wiapy — Samara Criar Art's Convites" }] }),
+  head: () => ({ meta: [{ title: "Pagamentos Asaas — Samara Studio Arts" }] }),
   component: PaymentSettings,
 });
 
@@ -17,14 +20,9 @@ function PaymentSettings() {
   const [session, setSession] = useState<any>(null);
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [busy, setBusy] = useState<"status" | "webhook" | "reconcile" | null>(null);
   const [message, setMessage] = useState("");
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [price, setPrice] = useState("");
-  const [checkoutId, setCheckoutId] = useState("");
-  const [checkoutUrl, setCheckoutUrl] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
-  const [diagnostics, setDiagnostics] = useState<Diagnostics | null>(null);
+  const [status, setStatus] = useState<AsaasStatus | null>(null);
 
   useEffect(() => {
     if (!supabase) { setChecking(false); return; }
@@ -36,25 +34,20 @@ function PaymentSettings() {
 
   useEffect(() => {
     let alive = true;
-    async function load() {
-      if (!supabase || !session?.user) { setAuthorized(false); setOffers([]); setChecking(false); return; }
-      setChecking(true);
-      const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
-      if (!alive) return;
-      if (!admin) {
+    async function verifyAdmin() {
+      if (!supabase || !session?.user) {
         setAuthorized(false);
-        setMessage("Esta conta ainda não tem permissão administrativa.");
         setChecking(false);
         return;
       }
-      setAuthorized(true);
-      const { data: rows, error } = await supabase.from("wiapy_offers").select("id,price_cents,checkout_id,checkout_url,is_active").order("price_cents");
+      setChecking(true);
+      const { data, error } = await supabase.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
       if (!alive) return;
-      if (error) setMessage(error.message);
-      else setOffers((rows ?? []) as Offer[]);
+      setAuthorized(Boolean(data && !error));
+      if (error || !data) setMessage("Esta conta ainda não tem permissão administrativa.");
       setChecking(false);
     }
-    void load();
+    void verifyAdmin();
     return () => { alive = false; };
   }, [session]);
 
@@ -62,64 +55,34 @@ function PaymentSettings() {
     event.preventDefault();
     if (!supabase) return;
     setMessage("Enviando link de acesso...");
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin + "/pagamentos" } });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.origin + "/pagamentos" },
+    });
     setMessage(error ? error.message : "Link enviado. Abra o e-mail neste mesmo dispositivo.");
   }
 
-  async function testServerConfiguration() {
-    if (!supabase || !authorized) return;
-    setTesting(true);
+  async function runAction(action: "status" | "webhook" | "reconcile") {
+    setBusy(action);
     setMessage("");
-    const { data, error } = await supabase.functions.invoke("wiapy-config-status", { body: {} });
-    setTesting(false);
-    if (error || data?.error) {
-      setDiagnostics(null);
-      setMessage(data?.error || error?.message || "Não foi possível verificar o servidor. A função pode ainda não ter sido publicada no Supabase.");
-      return;
+    try {
+      const result = await asaasAdminAction({ data: { action } });
+      setStatus(result);
+      if (action === "webhook") setMessage("Solicitação de ativação do webhook concluída. Confira o status abaixo.");
+      else if (action === "reconcile") setMessage("Reconciliação concluída. Os pedidos elegíveis foram consultados.");
+      else setMessage("Status da conexão consultado.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível concluir a operação. Confira a configuração do servidor.");
+    } finally {
+      setBusy(null);
     }
-    setDiagnostics({
-      webhookTokenConfigured: Boolean(data.webhookTokenConfigured),
-      serviceRoleConfigured: Boolean(data.serviceRoleConfigured),
-    });
-    setMessage("Verificação concluída. Veja os resultados abaixo.");
-  }
-
-  async function saveOffer(event: FormEvent) {
-    event.preventDefault();
-    if (!supabase || !authorized) return;
-    const cents = Math.round(Number(price.replace(",", ".")) * 100);
-    if (!Number.isSafeInteger(cents) || cents < 190 || cents > 39700 || !checkoutId.trim() || !/^https:\/\//i.test(checkoutUrl.trim())) {
-      setMessage("Informe preço entre R$ 1,90 e R$ 397,00, ID do checkout e link HTTPS da oferta.");
-      return;
-    }
-    const sameCheckout = offers.filter((offer) => offer.checkout_id === checkoutId.trim() && offer.is_active && offer.price_cents !== cents);
-    if (sameCheckout.length >= 10) { setMessage("Este checkout já tem 10 ofertas ativas. Crie outro checkout na Wiapy para novas faixas de preço."); return; }
-    setSaving(true);
-    const { error } = await supabase.from("wiapy_offers").upsert({
-      price_cents: cents,
-      checkout_id: checkoutId.trim(),
-      checkout_url: checkoutUrl.trim(),
-      is_active: true,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "price_cents" });
-    setSaving(false);
-    if (error) { setMessage(error.message); return; }
-    setMessage("Oferta salva. Convites com este preço poderão usar este link.");
-    setPrice(""); setCheckoutId(""); setCheckoutUrl("");
-    const { data } = await supabase.from("wiapy_offers").select("id,price_cents,checkout_id,checkout_url,is_active").order("price_cents");
-    setOffers((data ?? []) as Offer[]);
-  }
-
-  async function toggle(offer: Offer) {
-    if (!supabase) return;
-    const { error } = await supabase.from("wiapy_offers").update({ is_active: !offer.is_active, updated_at: new Date().toISOString() }).eq("id", offer.id);
-    if (error) { setMessage(error.message); return; }
-    setOffers((items) => items.map((item) => item.id === offer.id ? { ...item, is_active: !item.is_active } : item));
   }
 
   async function logout() {
     await supabase?.auth.signOut();
-    setSession(null); setAuthorized(false); setOffers([]); setDiagnostics(null);
+    setSession(null);
+    setAuthorized(false);
+    setStatus(null);
   }
 
   return (
@@ -128,8 +91,8 @@ function PaymentSettings() {
         <Link to="/admin" className="mb-6 inline-flex items-center gap-2 text-sm text-violet-700"><ArrowLeft size={16}/> Voltar ao painel administrativo</Link>
         <div className="rounded-3xl border border-violet-100 bg-white p-5 shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-600">Configuração de pagamentos</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold">Ofertas Wiapy</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Cadastre uma faixa de preço por oferta. Assim, um único produto digital genérico na Wiapy pode atender vários convites, sem cadastrar cada convite como produto.</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold">Integração Asaas</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Consulte a conexão, ative o webhook de confirmação e execute a reconciliação de pedidos. As credenciais ficam exclusivamente nos secrets do servidor.</p>
 
           {!isSupabaseConfigured && <div className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">O Supabase ainda não está configurado neste ambiente.</div>}
           {checking && <p className="mt-5 text-sm text-slate-500">Verificando acesso...</p>}
@@ -143,51 +106,38 @@ function PaymentSettings() {
             </form>
           )}
 
-          {!checking && session && !authorized && <p className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">A conta conectada não está na lista de administradores. Um responsável autorizado precisa conceder a permissão no Supabase.</p>}
+          {!checking && session && !authorized && <p className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">A conta conectada não está na lista de administradores.</p>}
 
           {authorized && (
             <>
               <div className="mt-6 flex justify-end"><button onClick={logout} className="text-xs text-slate-500 underline">Sair</button></div>
               <section className="mt-4 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
-                <div className="flex items-center gap-2"><ShieldCheck size={19} className="text-violet-700"/><h2 className="font-semibold">Verificação segura da integração</h2></div>
-                <p className="mt-2 text-sm leading-6 text-slate-600">Neste modelo, o cliente paga no checkout hospedado da Wiapy. A loja confirma o pagamento pelo webhook; por isso, não é necessário guardar uma chave de API da Wiapy no painel. O segredo do webhook fica somente nos Secrets do Supabase.</p>
-                <button type="button" disabled={testing} onClick={() => void testServerConfiguration()} className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><RefreshCw size={15} className={testing ? "animate-spin" : ""}/>{testing ? "Verificando..." : "Testar configuração segura"}</button>
-                {diagnostics && <div className="mt-3 space-y-2 rounded-xl bg-white p-3 text-sm">
-                  <p className="flex items-center gap-2">{diagnostics.webhookTokenConfigured ? <CheckCircle2 className="text-emerald-600" size={17}/> : <CircleAlert className="text-amber-600" size={17}/>} Secret WIAPY_WEBHOOK_TOKEN: {diagnostics.webhookTokenConfigured ? "configurado" : "não configurado"}</p>
-                  <p className="flex items-center gap-2">{diagnostics.serviceRoleConfigured ? <CheckCircle2 className="text-emerald-600" size={17}/> : <CircleAlert className="text-amber-600" size={17}/>} Credencial de servidor Supabase: {diagnostics.serviceRoleConfigured ? "disponível" : "não disponível"}</p>
-                  <p className="text-xs leading-5 text-slate-500">Este teste verifica a configuração do Supabase; não realiza cobrança nem confirma acesso à API privada da Wiapy.</p>
-                </div>}
+                <div className="flex items-center gap-2"><ShieldCheck size={19} className="text-violet-700"/><h2 className="font-semibold">Operações seguras</h2></div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Nenhuma dessas ações cria uma cobrança. A reconciliação apenas consulta pagamentos existentes e atualiza pedidos que correspondam ao valor e à referência registrados.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <button type="button" disabled={busy !== null} onClick={() => void runAction("status")} className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-700 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"><RefreshCw size={15} className={busy === "status" ? "animate-spin" : ""}/>{busy === "status" ? "Consultando..." : "Consultar status"}</button>
+                  <button type="button" disabled={busy !== null} onClick={() => void runAction("webhook")} className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-700 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"><Webhook size={15}/>{busy === "webhook" ? "Ativando..." : "Configurar webhook"}</button>
+                  <button type="button" disabled={busy !== null} onClick={() => void runAction("reconcile")} className="inline-flex items-center justify-center gap-2 rounded-full border border-violet-200 bg-white px-4 py-3 text-sm font-semibold text-violet-700 disabled:opacity-50"><RefreshCw size={15} className={busy === "reconcile" ? "animate-spin" : ""}/>{busy === "reconcile" ? "Verificando..." : "Reconciliar pedidos"}</button>
+                </div>
               </section>
-              <form onSubmit={saveOffer} className="mt-5 grid gap-3 rounded-2xl bg-violet-50/70 p-4 sm:grid-cols-2">
-                <label className="text-sm font-medium">Preço (R$)
-                  <input value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Ex.: 25,00" inputMode="decimal" className="mt-1 w-full rounded-xl border bg-white px-3 py-3"/>
-                </label>
-                <label className="text-sm font-medium">ID do checkout Wiapy
-                  <input value={checkoutId} onChange={(event) => setCheckoutId(event.target.value)} placeholder="ID mostrado no painel" className="mt-1 w-full rounded-xl border bg-white px-3 py-3"/>
-                </label>
-                <label className="text-sm font-medium sm:col-span-2">Link da oferta Wiapy
-                  <input value={checkoutUrl} onChange={(event) => setCheckoutUrl(event.target.value)} placeholder="https://..." type="url" className="mt-1 w-full rounded-xl border bg-white px-3 py-3"/>
-                </label>
-                <button disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-full bg-violet-700 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50 sm:col-span-2"><Save size={16}/>{saving ? "Salvando..." : "Salvar faixa de preço"}</button>
-              </form>
-              <h2 className="mt-8 font-display text-xl font-semibold">Faixas cadastradas</h2>
-              <div className="mt-3 space-y-2">
-                {offers.length ? offers.map((offer) => (
-                  <div key={offer.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3">
-                    <div className="min-w-0">
-                      <p className="font-semibold">{money(offer.price_cents)}</p>
-                      <p className="truncate text-xs text-slate-500">Checkout: {offer.checkout_id}</p>
-                      <a href={offer.checkout_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-violet-700 underline"><Link2 size={12}/> Abrir link da oferta</a>
-                    </div>
-                    <button onClick={() => toggle(offer)} className="inline-flex items-center gap-2 text-xs font-medium">{offer.is_active ? <><ToggleRight className="text-emerald-600"/> Ativa</> : <><ToggleLeft className="text-slate-400"/> Inativa</>}</button>
-                  </div>
-                )) : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">Nenhuma faixa cadastrada.</p>}
+
+              {status && <section className="mt-5 rounded-2xl border border-slate-100 p-4">
+                <h2 className="font-semibold">Resultado da verificação</h2>
+                <div className="mt-3 space-y-3 text-sm">
+                  <p className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-emerald-600"/> Conexão consultada: {status.accountStatus}</p>
+                  <p className="flex items-start gap-2"><CircleAlert size={17} className="mt-0.5 shrink-0 text-amber-600"/> Situação bancária: {status.bankStatus}</p>
+                  <p className="flex items-center gap-2">{status.webhookActive ? <CheckCircle2 size={17} className="text-emerald-600"/> : <CircleAlert size={17} className="text-amber-600"/>} Webhook: {status.webhookActive ? "ativo" : "ainda não está ativo"}</p>
+                </div>
+              </section>}
+
+              <div className="mt-6 rounded-xl bg-blue-50 p-4 text-xs leading-5 text-blue-900">
+                <p className="font-semibold">Antes de ativar em produção</p>
+                <p className="mt-1">Configure os secrets necessários no ambiente de hospedagem e no Asaas. Nunca cole chaves de API, tokens de webhook, CPF ou dados bancários no chat ou no código-fonte. Faça primeiro a validação em ambiente de testes.</p>
               </div>
-              <div className="mt-6 flex gap-2 rounded-xl bg-blue-50 p-4 text-xs leading-5 text-blue-900"><CircleAlert size={18} className="shrink-0"/> A Wiapy documenta até 10 ofertas por checkout e um limite padrão de R$ 397,00 por oferta. Use o mesmo ID para as faixas do mesmo checkout; cada preço usa o link próprio da oferta.</div>
             </>
           )}
-          {message && <p role="status" className="mt-4 rounded-xl bg-slate-100 p-3 text-sm">{message}</p>}
-          <div className="mt-6 flex items-start gap-2 border-t pt-4 text-xs leading-5 text-slate-500"><CheckCircle2 size={16} className="mt-0.5 shrink-0"/> O recebimento e a conta Wiapy precisam ser administrados por um responsável adulto autorizado. Não compartilhe senhas, tokens ou chaves secretas no chat.</div>
+
+          {message && <p role="status" className="mt-5 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">{message}</p>}
         </div>
       </div>
     </main>
