@@ -1,0 +1,2 @@
+create policy "Server manages Asaas events" on public.asaas_payment_events for all to service_role using (true) with check (true);
+create index asaas_payment_events_order_idx on public.asaas_payment_events(order_id);
