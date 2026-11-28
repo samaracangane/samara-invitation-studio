@@ -21,6 +21,8 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as RetornoRouteImport } from './routes/retorno'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ConviteIdRouteImport } from './routes/convite.$id'
+import { Route as ApiPublicAsaasReconcileRouteImport } from './routes/api/public/asaas-reconcile'
+import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +84,16 @@ const ConviteIdRoute = ConviteIdRouteImport.update({
   path: '/convite/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAsaasReconcileRoute = ApiPublicAsaasReconcileRouteImport.update({
+  id: '/api/public/asaas-reconcile',
+  path: '/api/public/asaas-reconcile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
+  id: '/api/public/asaas-webhook',
+  path: '/api/public/asaas-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +108,8 @@ export interface FileRoutesByFullPath {
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/api/public/asaas-reconcile': typeof ApiPublicAsaasReconcileRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +124,8 @@ export interface FileRoutesByTo {
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/api/public/asaas-reconcile': typeof ApiPublicAsaasReconcileRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +141,8 @@ export interface FileRoutesById {
   '/retorno': typeof RetornoRoute
   '/sobre': typeof SobreRoute
   '/convite/$id': typeof ConviteIdRoute
+  '/api/public/asaas-reconcile': typeof ApiPublicAsaasReconcileRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +159,8 @@ export interface FileRouteTypes {
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
+    | '/api/public/asaas-reconcile'
+    | '/api/public/asaas-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +175,8 @@ export interface FileRouteTypes {
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
+    | '/api/public/asaas-reconcile'
+    | '/api/public/asaas-webhook'
   id:
     | '__root__'
     | '/'
@@ -169,6 +191,8 @@ export interface FileRouteTypes {
     | '/retorno'
     | '/sobre'
     | '/convite/$id'
+    | '/api/public/asaas-reconcile'
+    | '/api/public/asaas-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +208,8 @@ export interface RootRouteChildren {
   RetornoRoute: typeof RetornoRoute
   SobreRoute: typeof SobreRoute
   ConviteIdRoute: typeof ConviteIdRoute
+  ApiPublicAsaasReconcileRoute: typeof ApiPublicAsaasReconcileRoute
+  ApiPublicAsaasWebhookRoute: typeof ApiPublicAsaasWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConviteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/asaas-reconcile': {
+      id: '/api/public/asaas-reconcile'
+      path: '/api/public/asaas-reconcile'
+      fullPath: '/api/public/asaas-reconcile'
+      preLoaderRoute: typeof ApiPublicAsaasReconcileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/asaas-webhook': {
+      id: '/api/public/asaas-webhook'
+      path: '/api/public/asaas-webhook'
+      fullPath: '/api/public/asaas-webhook'
+      preLoaderRoute: typeof ApiPublicAsaasWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +328,8 @@ const rootRouteChildren: RootRouteChildren = {
   RetornoRoute: RetornoRoute,
   SobreRoute: SobreRoute,
   ConviteIdRoute: ConviteIdRoute,
+  ApiPublicAsaasReconcileRoute: ApiPublicAsaasReconcileRoute,
+  ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

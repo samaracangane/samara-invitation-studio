@@ -167,6 +167,7 @@ export type Database = {
           access_token_hash: string | null
           amount_cents: number
           asaas_customer_id: string | null
+          checkout_claimed_at: string | null
           checkout_url: string | null
           created_at: string
           currency: string
@@ -198,6 +199,7 @@ export type Database = {
           access_token_hash?: string | null
           amount_cents: number
           asaas_customer_id?: string | null
+          checkout_claimed_at?: string | null
           checkout_url?: string | null
           created_at?: string
           currency?: string
@@ -229,6 +231,7 @@ export type Database = {
           access_token_hash?: string | null
           amount_cents?: number
           asaas_customer_id?: string | null
+          checkout_claimed_at?: string | null
           checkout_url?: string | null
           created_at?: string
           currency?: string
@@ -352,6 +355,8 @@ export type Database = {
         Args: { order_folder: string }
         Returns: boolean
       }
+      claim_asaas_check: { Args: { p_order_id: string }; Returns: boolean }
+      claim_asaas_checkout: { Args: { p_order_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
