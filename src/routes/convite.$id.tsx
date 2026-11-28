@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { InviteCanvas } from "@/components/InviteCanvas";
 import { mapSupabaseInvite } from "@/data/invites";
 import { supabase } from "@/lib/supabase";
+import { createAsaasCheckout } from "@/lib/asaas.functions";
 
 export const Route = createFileRoute("/convite/$id")({
   loader: async ({ params }) => {
@@ -34,6 +35,8 @@ export const Route = createFileRoute("/convite/$id")({
 
 function InviteProduct() {
   const { invite } = Route.useLoaderData();
+  const [customerName, setCustomerName] = useState("");
+  const [customerCpfCnpj, setCustomerCpfCnpj] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerWhatsapp, setCustomerWhatsapp] = useState("");
   const [selectedImage, setSelectedImage] = useState(invite.image);
@@ -48,45 +51,58 @@ function InviteProduct() {
   const [notice, setNotice] = useState("");
 
   async function startCheckout() {
-    if (!supabase) {
-      setNotice("O pagamento ainda não está conectado ao banco de dados.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
+      setNotice("Digite um e-mail válido para localizar seu pedido depois do pagamento.");
+      return;
+    }
+    if (!/^[0-9]{11}$|^[0-9]{14}$/.test(customerCpfCnpj.replace(/\D/g, ""))) {
+      setNotice("Informe um CPF ou CNPJ válido, somente para identificação do pagamento.");
+      return;
+    }
+    if (customerName.trim().length < 2) {
+      setNotice("Informe o nome completo de quem está realizando a compra.");
       return;
     }
     if (!/^\+?[0-9()\s-]{10,20}$/.test(customerWhatsapp.trim())) {
       setNotice("Informe um WhatsApp válido com DDD.");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
-      setNotice("Digite um e-mail válido para localizar seu pedido depois do pagamento.");
-      return;
-    }
+
     setBusy(true);
     setNotice("");
-    const { data, error } = await supabase.functions.invoke("create-checkout", {
-      body: {
-        inviteSlug: invite.id,
-        customerEmail: customerEmail.trim().toLowerCase(),
-        customerWhatsapp: customerWhatsapp.trim(),
-        eventDetails: {
-          celebrantName: eventName.trim(),
-          age: eventAge.trim(),
-          eventDate,
-          eventTime,
-          location: eventLocation.trim(),
-          address: eventAddress.trim(),
-          message: eventMessage.trim(),
+    const orderId = crypto.randomUUID();
+    const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
+    const accessToken = Array.from(tokenBytes, (value) => value.toString(16).padStart(2, "0")).join("");
+
+    try {
+      const data = await createAsaasCheckout({
+        data: {
+          orderId,
+          accessToken,
+          inviteSlug: invite.id,
+          customerName: customerName.trim(),
+          customerCpfCnpj: customerCpfCnpj.replace(/\D/g, ""),
+          customerEmail: customerEmail.trim().toLowerCase(),
+          customerWhatsapp: customerWhatsapp.trim(),
+          eventDetails: {
+            celebrantName: eventName.trim(),
+            age: eventAge.trim(),
+            eventDate,
+            eventTime,
+            location: eventLocation.trim(),
+            address: eventAddress.trim(),
+            message: eventMessage.trim(),
+          },
         },
-      },
-    });
-    setBusy(false);
-    if (error || !data?.checkoutUrl || !data?.orderId || !data?.accessToken) {
-      setNotice(data?.error || error?.message || "Não foi possível iniciar o pagamento. Verifique se o checkout está configurado.");
-      return;
+      });
+      const saved = { orderId: data.orderId, accessToken: data.accessToken, inviteId: invite.id };
+      localStorage.setItem("samara-order:" + data.orderId, JSON.stringify(saved));
+      localStorage.setItem("samara-last-order", JSON.stringify(saved));
+      window.location.assign(data.checkoutUrl);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível iniciar o pagamento. Tente novamente.");
+      setBusy(false);
     }
-    const saved = { orderId: data.orderId, accessToken: data.accessToken, inviteId: invite.id };
-    localStorage.setItem("samara-order:" + data.orderId, JSON.stringify(saved));
-    localStorage.setItem("samara-last-order", JSON.stringify(saved));
-    window.location.assign(data.checkoutUrl);
   }
 
 
@@ -148,11 +164,17 @@ function InviteProduct() {
                 <label className="block text-sm font-semibold">Observações ou mensagem extra
                   <textarea value={eventMessage} onChange={(event) => setEventMessage(event.target.value)} maxLength={500} rows={3} placeholder="Informações adicionais para colocar no convite..." className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
                 </label>
+                <label className="block text-sm font-semibold">Nome completo de quem está comprando *
+                  <input required value={customerName} onChange={(event) => setCustomerName(event.target.value)} maxLength={120} autoComplete="name" placeholder="Nome do responsável pela compra" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/>
+                </label>
+                <label className="block text-sm font-semibold">CPF ou CNPJ de quem está comprando *
+                  <input required value={customerCpfCnpj} onChange={(event) => setCustomerCpfCnpj(event.target.value)} maxLength={18} inputMode="numeric" autoComplete="off" placeholder="Somente números ou com pontuação" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Necessário para gerar a cobrança no Asaas.</span>
+                </label>
                 <label className="block text-sm font-semibold">WhatsApp com DDD *
                   <input required type="tel" inputMode="tel" autoComplete="tel" value={customerWhatsapp} onChange={(event) => setCustomerWhatsapp(event.target.value)} maxLength={20} placeholder="(11) 99999-9999" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Obrigatório para contato sobre seu pedido.</span>
                 </label>
                 <label className="block text-sm font-semibold">Seu e-mail *
-                  <input required type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use o mesmo e-mail no checkout Wiapy para identificarmos seu pagamento.</span>
+                  <input required type="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} placeholder="voce@exemplo.com" className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"/><span className="mt-1 block text-xs text-muted-foreground">Use este e-mail para localizar seu pedido e acompanhar o pagamento.</span>
                 </label>
               </div>
               <button type="button" onClick={startCheckout} disabled={busy} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 disabled:cursor-wait disabled:opacity-60">

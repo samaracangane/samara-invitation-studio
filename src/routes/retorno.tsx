@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Clock3, RefreshCw, XCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { getPaymentStatus } from "@/lib/asaas.functions";
 
 type SavedOrder = { orderId: string; accessToken: string; inviteId: string };
 type OrderState = { status: string; inviteId: string; inviteName: string; amountCents: number };
@@ -18,21 +18,20 @@ function ReturnPage() {
   const [message, setMessage] = useState("Localizando seu pedido...");
 
   async function checkOrder(current = saved) {
-    if (!current || !supabase) {
+    if (!current) {
       setMessage("Não encontramos um pedido salvo neste navegador.");
       return;
     }
     setBusy(true);
-    const { data, error } = await supabase.functions.invoke("order-status", {
-      body: { orderId: current.orderId, accessToken: current.accessToken },
-    });
-    setBusy(false);
-    if (error || !data) {
-      setMessage(data?.error || "Não foi possível consultar o pedido. Tente novamente mais tarde.");
-      return;
+    try {
+      const data = await getPaymentStatus({ data: { orderId: current.orderId, accessToken: current.accessToken, manual: true } });
+      setOrder(data as OrderState);
+      setMessage(data.status === "approved" ? "Pagamento confirmado! Seu editor está liberado." : "Ainda estamos aguardando a confirmação do pagamento.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível consultar o pedido. Tente novamente mais tarde.");
+    } finally {
+      setBusy(false);
     }
-    setOrder(data as OrderState);
-    setMessage(data.status === "approved" ? "Pagamento confirmado! Seu editor está liberado." : "Ainda estamos aguardando a confirmação da Wiapy.");
   }
 
   useEffect(() => {
