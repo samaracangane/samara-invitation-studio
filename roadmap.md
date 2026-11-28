@@ -4,7 +4,7 @@
 - [x] Conectar o checkout público ao fluxo Asaas já existente no servidor.
 - [x] Solicitar nome e CPF/CNPJ do comprador para gerar a cobrança.
 - [x] Consultar o status do pedido pela função de servidor, mantendo compatibilidade com pedidos antigos.
-- [ ] Substituir o painel de configuração Wiapy por painel de status, webhook e reconciliação Asaas.
+- [x] Substituir o painel de configuração Wiapy por painel de status, webhook e reconciliação Asaas.
 - [ ] Validar build, tipos e testes automatizados.
 - [ ] Configurar os secrets do servidor no ambiente de hospedagem, sem expor credenciais.
 - [ ] Aplicar as migrations no Supabase e validar RLS/permissões.
